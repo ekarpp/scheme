@@ -5,7 +5,7 @@
 #include "hashmap.h"
 #include "builtins.h"
 
-value_t *builtins_add(value_t *args)
+value_t *builtins_add(cons_t *args)
 {
     value_t *ret = malloc(sizeof(value_t));
     if (ret == NULL)
@@ -13,21 +13,21 @@ value_t *builtins_add(value_t *args)
 
     ret->type = V_LONG;
     ret->lng = 0L;
-    ret->next = NULL;
 
     while (args)
     {
-        if (args->type != V_LONG)
+        value_t *arg = args->car;
+        if (arg->type != V_LONG)
             break;// error
 
-        ret->lng += args->lng;
-        args = args->next;
+        ret->lng += arg->lng;
+        args = args->cdr;
     }
 
     return ret;
 }
 
-value_t *builtins_multiply(value_t *args)
+value_t *builtins_multiply(cons_t *args)
 {
     value_t *ret = malloc(sizeof(value_t));
     if (ret == NULL)
@@ -35,112 +35,110 @@ value_t *builtins_multiply(value_t *args)
 
     ret->type = V_LONG;
     ret->lng = 1L;
-    ret->next = NULL;
 
     while (args)
     {
-        if (args->type != V_LONG)
+        value_t *arg = args->car;
+        if (arg->type != V_LONG)
             break;// error
 
-        ret->lng *= args->lng;
-        args = args->next;
+        ret->lng *= arg->lng;
+        args = args->cdr;
     }
 
     return ret;
 }
 
-value_t *builtins_subtract(value_t *args)
+value_t *builtins_subtract(cons_t *args)
 {
     value_t *ret = malloc(sizeof(value_t));
     if (ret == NULL)
         return NULL;
 
     ret->type = V_LONG;
-    ret->next = NULL;
 
-    if (args == NULL || args->type != V_LONG)
+    if (args == NULL || args->car->type != V_LONG)
         return NULL;// error
 
-    ret->lng = args->lng;
-    if (args->next == NULL)
+    ret->lng = args->car->lng;
+    if (args->cdr == NULL)
         ret->lng = -ret->lng;
 
-    args = args->next;
+    args = args->cdr;
     while (args)
     {
-        if (args->type != V_LONG)
+        value_t *arg = args->car;
+        if (arg->type != V_LONG)
             break;// error
-        ret->lng -= args->lng;
-        args = args->next;
+        ret->lng -= arg->lng;
+        args = args->cdr;
     }
 
     return ret;
 }
 
-value_t *builtins_divide(value_t *args)
+value_t *builtins_divide(cons_t *args)
 {
     value_t *ret = malloc(sizeof(value_t));
     if (ret == NULL)
         return NULL;
 
     ret->type = V_LONG;
-    ret->next = NULL;
 
-    if (args == NULL || args->type != V_LONG)
+    if (args == NULL || args->car->type != V_LONG)
         return NULL;// error
 
-    ret->lng = args->lng;
-    if (args->next == NULL)
+    ret->lng = args->car->lng;
+    if (args->cdr == NULL)
         ret->lng = 0L;
 
-    args = args->next;
+    args = args->cdr;
     while (args)
     {
-        ret->lng /= args->lng;
-        args = args->next;
+        ret->lng /= args->car->lng;
+        args = args->cdr;
     }
 
     return ret;
 }
 
-value_t *builtins_abs(value_t *args)
+value_t *builtins_abs(cons_t *args)
 {
     value_t *ret = malloc(sizeof(value_t));
     if (ret == NULL)
         return NULL;
-    ret->next = NULL;
     ret->type = V_LONG;
-    if (args == NULL || args->type != V_LONG)
+
+    if (args == NULL || args->car->type != V_LONG)
         return NULL;// error
-    ret->lng = args->lng < 0 ? -args->lng : args->lng;
+    ret->lng = args->car->lng < 0 ? -args->car->lng : args->car->lng;
     return ret;
 }
 
-value_t *builtins_eqv(value_t *args)
+value_t *builtins_eqv(cons_t *args)
 {
     value_t *ret = malloc(sizeof(value_t));
     if (ret == NULL)
         return NULL;
 
     ret->type = V_BOOL;
-    ret->next = NULL;
     ret->b = 0;
 
-    if (args->type != args->next->type)
+    if (args->car->type != args->cdr->car->type)
         return ret;
 
-    switch (args->type)
+    switch (args->car->type)
     {
     case V_LONG:
-        ret->b = args->lng == args->next->lng;
+        ret->b = args->car->lng == args->cdr->car->lng;
         return ret;
     case V_BOOL:
-        ret->b = args->b == args->next->b;
+        ret->b = args->car->b == args->cdr->car->b;
         return ret;
     }
 }
 
-value_t *builtins_cmp(value_t *args, char op)
+value_t *builtins_cmp(cons_t *args, char op)
 {
     value_t *ret = malloc(sizeof(value_t));
     if (ret == NULL)
@@ -149,69 +147,70 @@ value_t *builtins_cmp(value_t *args, char op)
     ret->type = V_BOOL;
     ret->b = 1;
 
-    if (args == NULL || args->type != V_LONG
-        || args->next == NULL)
+    if (args == NULL || args->car->type != V_LONG
+        || args->cdr == NULL)
         return NULL;// error
 
-    value_t *prev = args;
-    args = args->next;
+    value_t *prev = args->car;
+    args = args->cdr;
     while (args && ret->b)
     {
-        if (args->type != V_LONG)
+        value_t *curr = args->car;
+        if (curr->type != V_LONG)
             break;// error
         switch (op)
         {
         case '<':
-            ret->b = prev->lng < args->lng;
+            ret->b = prev->lng < curr->lng;
             break;
         case '>':
-            ret->b = prev->lng > args->lng;
+            ret->b = prev->lng > curr->lng;
             break;
         case '=':
-            ret->b = prev->lng == args->lng;
+            ret->b = prev->lng == curr->lng;
             break;
         case 'd':
-            ret->b = prev->lng >= args->lng;
+            ret->b = prev->lng >= curr->lng;
             break;
         case 'i':
-            ret->b = prev->lng <= args->lng;
+            ret->b = prev->lng <= curr->lng;
             break;
         }
 
-        prev = args;
-        args = args->next;
+        prev = curr;
+        args = args->cdr;
     }
 
     return ret;
 
 }
 
-value_t *builtins_equal(value_t *args)
+value_t *builtins_equal(cons_t *args)
 {
     return builtins_cmp(args, '=');
 }
 
-value_t *builtins_increasing(value_t *args)
+value_t *builtins_increasing(cons_t *args)
 {
     return builtins_cmp(args, '<');
 }
 
-value_t *builtins_non_increasing(value_t *args)
+value_t *builtins_non_increasing(cons_t *args)
 {
     return builtins_cmp(args, 'i');
 }
 
-value_t *builtins_decreasing(value_t *args)
+value_t *builtins_decreasing(cons_t *args)
 {
     return builtins_cmp(args, '>');
 }
 
-value_t *builtins_non_decreasing(value_t *args)
+value_t *builtins_non_decreasing(cons_t *args)
 {
     return builtins_cmp(args, 'd');
 }
 
-value_t *builtins_lambda(value_t *args)
+value_t *builtins_lambda(cons_t *args)
 {
     return NULL;
 }

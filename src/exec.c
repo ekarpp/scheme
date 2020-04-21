@@ -55,7 +55,6 @@ long long str_to_lng(char *str)
 value_t *token_to_value(token_t *t)
 {
     value_t *val = malloc(sizeof(value_t));
-    val->next = NULL;
     switch (t->type)
     {
     case T_IDENTIFIER: case T_STRING:
@@ -70,6 +69,27 @@ value_t *token_to_value(token_t *t)
 }
 
 
+cons_t *cons_init(void)
+{
+    cons_t *cons = malloc(sizeof(cons_t));
+    if (cons == NULL)
+        return NULL;
+    cons->cdr = NULL;
+    cons->car = NULL;
+    return cons;
+}
+
+void cons_free(cons_t *cons)
+{
+    while (cons)
+    {
+        cons_t *tmp = cons->cdr;
+        value_free(cons->car);
+        free(cons);
+        cons = tmp;
+    }
+}
+
 void value_free(value_t *val)
 {
     if (val->type == V_STRING && val->str)
@@ -79,12 +99,6 @@ void value_free(value_t *val)
 
 void expr_free(expr_t *expr)
 {
-    value_t *v = expr->args;
-    while (v != NULL)
-    {
-        value_t *next = v->next;
-        value_free(v);
-        v = next;
-    }
+    cons_free(expr->args);
     free(expr);
 }

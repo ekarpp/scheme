@@ -20,6 +20,7 @@ parser_t *parser_init(void)
     return prsr;
 }
 
+/* parses text using prsr */
 int parser_parse(parser_t *prsr, char *text)
 {
     lexer_t *lxr = prsr->lxr;
@@ -47,21 +48,19 @@ int parser_parse(parser_t *prsr, char *text)
     return 1;
 }
 
-
-
+/* parses an expression (expr) */
 value_t *parser_expression(parser_t *prsr)
 {
     lexer_t *lxr = prsr->lxr;
     expr_t *expr = malloc(sizeof(expr_t));
     if (expr == NULL)
-        return 0;
+        return NULL;
 
-    expr->args = NULL;
-    expr->last = NULL;
-    expr->nargs = 0;
+
 
     lexer_get_next_token(lxr);
 
+    /* get procedure name */
     value_t *val;
     switch(lxr->t->type)
     {
@@ -79,67 +78,36 @@ value_t *parser_expression(parser_t *prsr)
     }
 
     lexer_get_next_token(lxr);
+
+    /* parse arguments */
+    expr->args = NULL;
+    cons_t *last;
     while (lxr->t->type != ')')
     {
-        value_t *v;
+        if (expr->args == NULL)
+        {
+            expr->args = cons_init();
+            last = expr->args;
+        }
+        else
+        {
+            last->cdr = cons_init();
+            last = last->cdr;
+        }
+
         switch (lxr->t->type)
         {
             case T_END: // unexpected EOF
                 return NULL;
             case T_IDENTIFIER: case T_STRING: case T_LONG:
-                v = token_to_value(lxr->t);
+                last->car = token_to_value(lxr->t);
                 break;
             case '(':
-                v = parser_expression(prsr);
-        }
-        expr->nargs++;
-        if (expr->last == NULL)
-        {
-            expr->last = v;
-            expr->args = v;
-        }
-        else
-        {
-            expr->last->next = v;
-            expr->last = v;
+                last->car = parser_expression(prsr);
         }
         lexer_get_next_token(lxr);
     }
     return exec_expr(prsr->env, expr);
-}
-
-void parser_args(parser_t *prsr, expr_t *expr)
-{
-    lexer_t *lxr = prsr->lxr;
-    while (lxr->t->type != T_END && lxr->t->type != ')')
-    {
-        value_t *v = malloc(sizeof(value_t));
-        v->next = NULL;
-        v->type = -1;
-        switch (lxr->t->type)
-        {
-            case T_IDENTIFIER: case T_STRING:
-                v->type = V_STRING;
-                v->str = lxr->t->lexeme;
-                break;
-            case T_LONG:
-                v->type = V_LONG;
-                v->lng = str_to_lng(lxr->t->lexeme);
-                break;
-        }
-        expr->nargs++;
-        if (expr->last == NULL)
-        {
-            expr->last = v;
-            expr->args = v;
-        }
-        else
-        {
-            expr->last->next = v;
-            expr->last = v;
-        }
-        lexer_get_next_token(lxr);
-    }
 }
 
 void parser_free(parser_t *prsr)

@@ -8,11 +8,7 @@
 typedef struct {
     lexer_t *lxr;
     env_t *env;
-    int brackets;
 } parser_t;
-
-
-
 
 parser_t *parser_init(void);
 int parser_parse(parser_t *prsr, char *text);
