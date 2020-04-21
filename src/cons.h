@@ -40,9 +40,11 @@ struct value_t {
 };
 
 cons_t *cons_init(void);
+void cons_output(cons_t *cons);
 void cons_free(cons_t *cons);
 
 long long str_to_long(char *str);
+value_t *empty_list(void);
 value_t *token_to_value(token_t *t);
 void value_output(value_t *val);
 void value_free(value_t *val);

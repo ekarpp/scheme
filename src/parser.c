@@ -53,43 +53,17 @@ int parser_parse(parser_t *prsr, char *text)
 value_t *parser_expression(parser_t *prsr)
 {
     lexer_t *lxr = prsr->lxr;
-    expr_t *expr = malloc(sizeof(expr_t));
-    if (expr == NULL)
-        return NULL;
-
-
-
     lexer_get_next_token(lxr);
 
-    /* get procedure name */
-    value_t *val;
-    switch(lxr->t->type)
-    {
-        case T_IDENTIFIER:
-            expr->op = lxr->t->lexeme;
-            lxr->t->lexeme = NULL;
-            break;
-        case '(':
-            val = parser_expression(prsr);
-            if (val->type != V_STRING)
-                return NULL;
-            expr->op = val->str;
-            val->str = NULL;
-            break;
-    }
 
-    lexer_get_next_token(lxr);
 
+    cons_t *expr = cons_init();
     /* parse arguments */
-    expr->args = NULL;
-    cons_t *last;
+    cons_t *last = NULL;
     while (lxr->t->type != ')')
     {
-        if (expr->args == NULL)
-        {
-            expr->args = cons_init();
-            last = expr->args;
-        }
+        if (last == NULL)
+            last = expr;
         else
         {
             last->cdr = cons_init();
@@ -108,7 +82,9 @@ value_t *parser_expression(parser_t *prsr)
         }
         lexer_get_next_token(lxr);
     }
-    return exec_expr(prsr->env, expr);
+    value_t *ret = exec_expr(prsr->env, expr);
+    cons_free(expr);
+    return ret;
 }
 
 void parser_free(parser_t *prsr)

@@ -51,11 +51,30 @@ value_t *token_to_value(token_t *t)
     case T_IDENTIFIER: case T_STRING:
         val->type = V_STRING;
         val->str = t->lexeme;
+        t->lexeme = NULL;
         break;
     case T_LONG:
         val->type = V_LONG;
         val->lng = str_to_lng(t->lexeme);
         break;
+    }
+    return val;
+}
+
+value_t *empty_list(void)
+{
+    value_t *l = malloc(sizeof(value_t));
+    l->type = V_LIST;
+    l->cons = NULL;
+    return l;
+}
+
+void cons_output(cons_t *cons)
+{
+    while (cons && cons->car)
+    {
+        value_output(cons->car);
+        cons = cons->cdr;
     }
 }
 
@@ -71,6 +90,9 @@ void value_output(value_t *val)
         break;
     case V_BOOL:
         printf("%s\n", val->b ? "#t" : "#f");
+        break;
+    case V_LIST:
+        cons_output(val->cons);
         break;
     case V_PROCEDURE:    case V_BUILTIN:
         break;

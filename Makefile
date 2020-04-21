@@ -1,4 +1,4 @@
-CCFLAGS := -O0 -std=gnu99 -W
+CCFLAGS := -O0 -std=gnu99 -W -g
 PROG := scheme
 #OBJS := main.o interpretor.o lexer.o parser.o exec.o hashmap.o
 SRCS := main.c src/*.c
