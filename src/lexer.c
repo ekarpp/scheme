@@ -1,5 +1,5 @@
 #include <stdlib.h>
-#include <stdio.h>
+
 #include "lexer.h"
 
 lexer_t *lexer_init(void)

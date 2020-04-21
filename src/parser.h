@@ -1,6 +1,7 @@
 #ifndef PARSER
 #define PARSER
 
+#include "cons.h"
 #include "lexer.h"
 #include "exec.h"
 #include "env.h"

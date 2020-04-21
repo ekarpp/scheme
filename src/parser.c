@@ -4,6 +4,7 @@
 
 #include "parser.h"
 #include "exec.h"
+#include "cons.h"
 #include "env.h"
 #include "builtins.h"
 

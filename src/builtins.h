@@ -1,7 +1,7 @@
 #ifndef _BUILTINS_H
 #define _BUILTINS_H
 
-#include "exec.h"
+#include "cons.h"
 #include "env.h"
 
 value_t *builtins_add(cons_t *args);
