@@ -93,6 +93,7 @@ void value_output(value_t *val, env_t *env)
     switch (val->type)
     {
     case V_IDENTIFIER:
+        // check here that we actually get a value
         value_output(env_get(env, val->str), env);
         break;
     case V_STRING:
@@ -117,7 +118,8 @@ void value_free(value_t *val)
 {
     if (val == NULL)
         return;
-    if (val->type == V_STRING && val->str)
+    if ((val->type == V_IDENTIFIER || val->type == V_STRING)
+        && val->str)
         free(val->str);
     free(val);
 }
