@@ -28,22 +28,26 @@ int parser_parse(parser_t *prsr, char *text)
     lxr->curr = text;
     lexer_get_next_token(lxr);
     value_t *val = NULL;
+    value_t *tmp = NULL;
 
     while (lxr->t->type != T_END)
     {
+        if (val)
+            value_free(val);
         switch (lxr->t->type)
         {
         case '(':
-            if (val)
-                value_free(val);
             val = parser_expression(prsr);
+            break;
+        case T_LONG: case T_STRING: case T_IDENTIFIER:
+            val = token_to_value(lxr->t);
             break;
         default:
             return 0;
         }
         lexer_get_next_token(lxr);
     }
-    value_output(val);
+    value_output(val, prsr->env);
     value_free(val);
 
     return 1;
@@ -82,7 +86,11 @@ value_t *parser_expression(parser_t *prsr)
         }
         lexer_get_next_token(lxr);
     }
-    value_t *ret = exec_expr(prsr->env, expr);
+    value_t *ret;
+    if (last == NULL)
+        ret = empty_list();
+    else
+        ret = exec_expr(prsr->env, expr);
     cons_free(expr);
     return ret;
 }

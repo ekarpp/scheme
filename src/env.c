@@ -47,4 +47,3 @@ void env_free(env_t *env)
         env = tmp;
     }
 }
-

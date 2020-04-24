@@ -1,6 +1,8 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
+#include "env.h"
 #include "cons.h"
 
 
@@ -46,9 +48,15 @@ long long str_to_lng(char *str)
 value_t *token_to_value(token_t *t)
 {
     value_t *val = malloc(sizeof(value_t));
+    value_t *tmp;
     switch (t->type)
     {
-    case T_IDENTIFIER: case T_STRING:
+    case T_IDENTIFIER:
+        val->type = V_IDENTIFIER;
+        val->str = t->lexeme;
+        t->lexeme = NULL;// leak
+        break;
+    case T_STRING:
         val->type = V_STRING;
         val->str = t->lexeme;
         t->lexeme = NULL;
@@ -69,32 +77,37 @@ value_t *empty_list(void)
     return l;
 }
 
-void cons_output(cons_t *cons)
+void cons_output(cons_t *cons, env_t *env)
 {
+    printf("(");
     while (cons && cons->car)
     {
-        value_output(cons->car);
+        value_output(cons->car, env);
         cons = cons->cdr;
     }
+    printf(")");
 }
 
-void value_output(value_t *val)
+void value_output(value_t *val, env_t *env)
 {
     switch (val->type)
     {
+    case V_IDENTIFIER:
+        value_output(env_get(env, val->str), env);
+        break;
     case V_STRING:
-        printf("%s\n", val->str);
+        printf("%s", val->str);
         break;
     case V_LONG:
-        printf("%lld\n", val->lng);
+        printf("%lld", val->lng);
         break;
     case V_BOOL:
-        printf("%s\n", val->b ? "#t" : "#f");
+        printf("%s", val->b ? "#t" : "#f");
         break;
     case V_LIST:
-        cons_output(val->cons);
+        cons_output(val->cons, env);
         break;
-    case V_PROCEDURE:    case V_BUILTIN:
+    case V_PROCEDURE: case V_BUILTIN:
         break;
 
     }
@@ -102,6 +115,8 @@ void value_output(value_t *val)
 
 void value_free(value_t *val)
 {
+    if (val == NULL)
+        return;
     if (val->type == V_STRING && val->str)
         free(val->str);
     free(val);

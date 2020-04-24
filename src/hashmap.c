@@ -38,7 +38,6 @@ void hashmap_put(hashmap_t *hm, char *key, void *value)
         hashmap_resize(hm);
 }
 
-#include <stdio.h>
 void hashmap_insert(hashmap_element_t **arr, int size, hashmap_element_t *e)
 {
     int i = e->hash % size;
