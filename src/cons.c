@@ -4,7 +4,7 @@
 
 #include "env.h"
 #include "cons.h"
-
+#include "exec.h"
 
 /* cons */
 
@@ -81,15 +81,22 @@ value_t *token_to_value(token_t *t)
 value_t *value_get(cons_t *cons, env_t *env)
 {
     value_t *val = cons->car;
-    if (val->type == V_IDENTIFIER)
+    value_t *tmp;
+    switch (val->type)
     {
-        value_t *tmp = env_get(env, val->str);
+    case V_IDENTIFIER:
+        tmp = env_get(env, val->str);
         val = value_init();
-        if (val == NULL)
-            return NULL;
         memcpy(val, tmp, sizeof(value_t));
         value_free(cons->car);
         cons->car = val;
+        break;
+    case V_LIST:
+        val = exec_expr(val->cons, env);
+        cons_free(cons->car->cons);
+        value_free(cons->car);
+        cons->car = val;
+        break;
     }
     return val;
 }

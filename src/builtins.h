@@ -12,7 +12,7 @@ value_t *builtins_abs(cons_t *args, env_t *env);
 
 value_t *builtins_eqv(cons_t *args, env_t *env);
 
-value_t *builtins_cmp(cons_t *args, char op);
+value_t *builtins_cmp(cons_t *args, char op, env_t *env);
 value_t *builtins_equal(cons_t *args, env_t *env);
 value_t *builtins_increasing(cons_t *args, env_t *env);
 value_t *builtins_non_increasing(cons_t *args, env_t *env);

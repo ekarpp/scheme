@@ -4,7 +4,7 @@
 #include "env.h"
 #include "cons.h"
 
-value_t *exec_expr(env_t *env, cons_t *expr)
+value_t *exec_expr(cons_t *expr, env_t *env)
 {
     if (expr->cdr == NULL)
         return empty_list();

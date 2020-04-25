@@ -144,23 +144,24 @@ value_t *builtins_eqv(cons_t *args, env_t *env)
     }
 }
 
-// todo: fix identifier
-value_t *builtins_cmp(cons_t *args, char op)
+value_t *builtins_cmp(cons_t *args, char op, env_t *env)
 {
     value_t *ret = value_init();
 
     ret->type = V_BOOL;
     ret->b = 1;
 
-    if (args == NULL || args->car->type != V_LONG
-        || args->cdr == NULL)
-        return NULL;// error
+    if (args == NULL || args->cdr == NULL)
+        return NULL;//invalid amount of arg error
 
-    value_t *prev = args->car;
+    value_t *prev = value_get(args, env);
+    if (prev->type != V_LONG)
+        return NULL; //invalid type error
+
     args = args->cdr;
     while (args && ret->b)
     {
-        value_t *curr = args->car;
+        value_t *curr = value_get(args, env);
         if (curr->type != V_LONG)
             break;// error
         switch (op)
@@ -192,27 +193,27 @@ value_t *builtins_cmp(cons_t *args, char op)
 
 value_t *builtins_equal(cons_t *args, env_t *env)
 {
-    return builtins_cmp(args, '=');
+    return builtins_cmp(args, '=', env);
 }
 
 value_t *builtins_increasing(cons_t *args, env_t *env)
 {
-    return builtins_cmp(args, '<');
+    return builtins_cmp(args, '<', env);
 }
 
 value_t *builtins_non_increasing(cons_t *args, env_t *env)
 {
-    return builtins_cmp(args, 'i');
+    return builtins_cmp(args, 'i', env);
 }
 
 value_t *builtins_decreasing(cons_t *args, env_t *env)
 {
-    return builtins_cmp(args, '>');
+    return builtins_cmp(args, '>', env);
 }
 
 value_t *builtins_non_decreasing(cons_t *args, env_t *env)
 {
-    return builtins_cmp(args, 'd');
+    return builtins_cmp(args, 'd', env);
 }
 
 value_t *builtins_lambda(cons_t *args, env_t *env)
