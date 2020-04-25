@@ -51,10 +51,15 @@ value_t *token_to_value(token_t *t)
     value_t *tmp;
     switch (t->type)
     {
+        // maybe instead fetch it
+        // if not found then make it a string ??
+
+        // make new struct for id??
+        // {char *, value_t *} ??
     case T_IDENTIFIER:
         val->type = V_IDENTIFIER;
         val->str = t->lexeme;
-        t->lexeme = NULL;// leak
+        t->lexeme = NULL;
         break;
     case T_STRING:
         val->type = V_STRING;
@@ -65,6 +70,22 @@ value_t *token_to_value(token_t *t)
         val->type = V_LONG;
         val->lng = str_to_lng(t->lexeme);
         break;
+    }
+    return val;
+}
+
+value_t *value_get(cons_t *cons, env_t *env)
+{
+    value_t *val = cons->car;
+    if (val->type == V_IDENTIFIER)
+    {
+        value_t *tmp = env_get(env, val->str);
+        val = malloc(sizeof(value_t));
+        if (val == NULL)
+            return NULL;
+        memcpy(val, tmp, sizeof(value_t));
+        value_free(cons->car);
+        cons->car = val;
     }
     return val;
 }

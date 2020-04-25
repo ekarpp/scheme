@@ -18,7 +18,7 @@ value_t *builtins_add(cons_t *args, env_t *env)
 
     while (args)
     {
-        value_t *arg = args->car;
+        value_t *arg = value_get(args, env);
         if (arg->type != V_LONG)
             break;// error
 
@@ -40,7 +40,7 @@ value_t *builtins_multiply(cons_t *args, env_t *env)
 
     while (args)
     {
-        value_t *arg = args->car;
+        value_t *arg = value_get(args, env);
         if (arg->type != V_LONG)
             break;// error
 
@@ -59,17 +59,21 @@ value_t *builtins_subtract(cons_t *args, env_t *env)
 
     ret->type = V_LONG;
 
-    if (args == NULL || args->car->type != V_LONG)
+    if (args == NULL)
         return NULL;// error
 
-    ret->lng = args->car->lng;
+    value_t *arg = value_get(args, env);
+    if (arg->type != V_LONG)
+        return NULL; // error
+
+    ret->lng = arg->lng;
     if (args->cdr == NULL)
         ret->lng = -ret->lng;
 
     args = args->cdr;
     while (args)
     {
-        value_t *arg = args->car;
+        arg = value_get(args, env);
         if (arg->type != V_LONG)
             break;// error
         ret->lng -= arg->lng;
@@ -87,17 +91,21 @@ value_t *builtins_divide(cons_t *args, env_t *env)
 
     ret->type = V_LONG;
 
-    if (args == NULL || args->car->type != V_LONG)
+    if (args == NULL)
         return NULL;// error
 
-    ret->lng = args->car->lng;
+    value_t *arg = value_get(args, env);
+
+    ret->lng = arg->lng;
     if (args->cdr == NULL)
         ret->lng = 0L;
 
     args = args->cdr;
     while (args)
     {
-        ret->lng /= args->car->lng;
+        arg = value_get(args, env);
+        // type check
+        ret->lng /= arg->lng;
         args = args->cdr;
     }
 
@@ -111,12 +119,20 @@ value_t *builtins_abs(cons_t *args, env_t *env)
         return NULL;
     ret->type = V_LONG;
 
-    if (args == NULL || args->car->type != V_LONG)
+    if (args == NULL)
         return NULL;// error
-    ret->lng = args->car->lng < 0 ? -args->car->lng : args->car->lng;
+
+    value_t *arg = value_get(args, env);
+
+    if (arg->type != V_LONG)
+        return NULL;// error
+
+    ret->lng = arg->lng < 0 ? -arg->lng : arg->lng;
     return ret;
 }
 
+
+// todo: fix identifier
 value_t *builtins_eqv(cons_t *args, env_t *env)
 {
     value_t *ret = malloc(sizeof(value_t));
@@ -140,6 +156,7 @@ value_t *builtins_eqv(cons_t *args, env_t *env)
     }
 }
 
+// todo: fix identifier
 value_t *builtins_cmp(cons_t *args, char op)
 {
     value_t *ret = malloc(sizeof(value_t));
