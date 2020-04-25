@@ -9,9 +9,7 @@
 
 value_t *builtins_add(cons_t *args, env_t *env)
 {
-    value_t *ret = malloc(sizeof(value_t));
-    if (ret == NULL)
-        return NULL;
+    value_t *ret = value_init();
 
     ret->type = V_LONG;
     ret->lng = 0L;
@@ -31,9 +29,7 @@ value_t *builtins_add(cons_t *args, env_t *env)
 
 value_t *builtins_multiply(cons_t *args, env_t *env)
 {
-    value_t *ret = malloc(sizeof(value_t));
-    if (ret == NULL)
-        return NULL;
+    value_t *ret = value_init();
 
     ret->type = V_LONG;
     ret->lng = 1L;
@@ -53,9 +49,7 @@ value_t *builtins_multiply(cons_t *args, env_t *env)
 
 value_t *builtins_subtract(cons_t *args, env_t *env)
 {
-    value_t *ret = malloc(sizeof(value_t));
-    if (ret == NULL)
-        return NULL;
+    value_t *ret = value_init();
 
     ret->type = V_LONG;
 
@@ -85,9 +79,7 @@ value_t *builtins_subtract(cons_t *args, env_t *env)
 
 value_t *builtins_divide(cons_t *args, env_t *env)
 {
-    value_t *ret = malloc(sizeof(value_t));
-    if (ret == NULL)
-        return NULL;
+    value_t *ret = value_init();
 
     ret->type = V_LONG;
 
@@ -114,9 +106,7 @@ value_t *builtins_divide(cons_t *args, env_t *env)
 
 value_t *builtins_abs(cons_t *args, env_t *env)
 {
-    value_t *ret = malloc(sizeof(value_t));
-    if (ret == NULL)
-        return NULL;
+    value_t *ret = value_init();
     ret->type = V_LONG;
 
     if (args == NULL)
@@ -135,9 +125,7 @@ value_t *builtins_abs(cons_t *args, env_t *env)
 // todo: fix identifier
 value_t *builtins_eqv(cons_t *args, env_t *env)
 {
-    value_t *ret = malloc(sizeof(value_t));
-    if (ret == NULL)
-        return NULL;
+    value_t *ret = value_init();
 
     ret->type = V_BOOL;
     ret->b = 0;
@@ -159,9 +147,7 @@ value_t *builtins_eqv(cons_t *args, env_t *env)
 // todo: fix identifier
 value_t *builtins_cmp(cons_t *args, char op)
 {
-    value_t *ret = malloc(sizeof(value_t));
-    if (ret == NULL)
-        return NULL;
+    value_t *ret = value_init();
 
     ret->type = V_BOOL;
     ret->b = 1;
@@ -236,9 +222,7 @@ value_t *builtins_lambda(cons_t *args, env_t *env)
 
 value_t *builtins_define(cons_t *args, env_t *env)
 {
-    value_t *ret = malloc(sizeof(value_t));
-    if (ret == NULL)
-        return NULL;
+    value_t *ret = value_init();
 
     if (args->car->type != V_IDENTIFIER)
         return NULL; // error
@@ -257,9 +241,7 @@ value_t *builtins_define(cons_t *args, env_t *env)
 
 void builtins_add_f(hashmap_t *hm, char *key, builtin_t f)
 {
-    value_t *val = malloc(sizeof(value_t));
-    if (val == NULL)
-        return;
+    value_t *val = value_init();
     val->type = V_BUILTIN;
     val->bif = f;
     hashmap_put(hm, key, val);

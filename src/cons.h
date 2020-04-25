@@ -45,6 +45,7 @@ void cons_output(cons_t *cons, env_t *env);
 void cons_free(cons_t *cons);
 
 long long str_to_long(char *str);
+value_t *value_init(void);
 value_t *empty_list(void);
 value_t *token_to_value(token_t *t);
 value_t *value_get(cons_t *cons, env_t *env);

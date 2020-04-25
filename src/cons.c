@@ -45,9 +45,18 @@ long long str_to_lng(char *str)
 
 /* value */
 
-value_t *token_to_value(token_t *t)
+value_t *value_init(void)
 {
     value_t *val = malloc(sizeof(value_t));
+    if (val == NULL)
+        return NULL; // todo: handle better
+
+    return val;
+}
+
+value_t *token_to_value(token_t *t)
+{
+    value_t *val = value_init();
     value_t *tmp;
     switch (t->type)
     {
@@ -80,7 +89,7 @@ value_t *value_get(cons_t *cons, env_t *env)
     if (val->type == V_IDENTIFIER)
     {
         value_t *tmp = env_get(env, val->str);
-        val = malloc(sizeof(value_t));
+        val = value_init();
         if (val == NULL)
             return NULL;
         memcpy(val, tmp, sizeof(value_t));
@@ -92,7 +101,7 @@ value_t *value_get(cons_t *cons, env_t *env)
 
 value_t *empty_list(void)
 {
-    value_t *l = malloc(sizeof(value_t));
+    value_t *l = value_init();
     l->type = V_LIST;
     l->cons = NULL;
     return l;
