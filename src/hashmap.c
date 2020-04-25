@@ -30,7 +30,8 @@ void hashmap_put(hashmap_t *hm, char *key, void *value)
     const int hash = hashmap_hash(key);
     hashmap_element_t *hme = malloc(sizeof(hashmap_element_t));
     hme->value = value;
-    hme->key = key;
+    hme->key = malloc(strlen(key) + 1);
+    strcpy(hme->key, key);
     hme->hash = hash;
     hashmap_insert(hm->arr, hm->size, hme);
     hm->used++;
@@ -92,6 +93,7 @@ hashmap_t *hashmap_init(void)
 
 void hashmap_free_element(hashmap_element_t *hme)
 {
+    free(hme->key);
     free(hme->value);
     free(hme);
 }

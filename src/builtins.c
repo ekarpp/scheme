@@ -227,12 +227,8 @@ value_t *builtins_define(cons_t *args, env_t *env)
     if (args->car->type != V_IDENTIFIER)
         return NULL; // error
 
-    char *key = args->car->str;// this fails maybe??
-
+    // maybe make variables here to make easier read
     hashmap_put(env->hm, args->car->str, args->cdr->car);
-    args->car->str = NULL; // memory leak here
-    // maybe malloc all hashmap keys ??
-    // or set flag that free this str ??
     memcpy(ret, args->cdr->car, sizeof(value_t));
 
     args->cdr->car = NULL;

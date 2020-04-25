@@ -60,8 +60,13 @@ value_t *token_to_value(token_t *t)
     value_t *tmp;
     switch (t->type)
     {
-    case T_STRING: case T_IDENTIFIER:
-        val->type = t->type;
+    case T_IDENTIFIER:
+        val->type = V_IDENTIFIER;
+        val->str = t->lexeme;
+        t->lexeme = NULL;
+        break;
+    case T_STRING:
+        val->type = V_STRING;
         val->str = t->lexeme;
         t->lexeme = NULL;
         break;
