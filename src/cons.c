@@ -60,18 +60,8 @@ value_t *token_to_value(token_t *t)
     value_t *tmp;
     switch (t->type)
     {
-        // maybe instead fetch it
-        // if not found then make it a string ??
-
-        // make new struct for id??
-        // {char *, value_t *} ??
-    case T_IDENTIFIER:
-        val->type = V_IDENTIFIER;
-        val->str = t->lexeme;
-        t->lexeme = NULL;
-        break;
-    case T_STRING:
-        val->type = V_STRING;
+    case T_STRING: case T_IDENTIFIER:
+        val->type = t->type;
         val->str = t->lexeme;
         t->lexeme = NULL;
         break;
