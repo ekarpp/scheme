@@ -6,12 +6,12 @@
 
 
 
-value_t *env_get(env_t *env, char *op)
+value_t *env_get(env_t *env, char *key)
 {
     value_t *ret = NULL;
     while (env)
     {
-        ret = hashmap_get(env->hm, op);
+        ret = hashmap_get(env->hm, key);
         if (ret)
             break;
         env = env->next;

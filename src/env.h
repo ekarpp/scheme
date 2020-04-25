@@ -11,7 +11,7 @@ struct env_t {
     env_t *next;
 };
 
-value_t *env_get(env_t *env, char *op);
+value_t *env_get(env_t *env, char *key);
 env_t *env_add(env_t *env);
 env_t *env_pop(env_t *env);
 void env_free(env_t *env);
