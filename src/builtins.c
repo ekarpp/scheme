@@ -218,7 +218,23 @@ value_t *builtins_non_decreasing(cons_t *args, env_t *env)
 
 value_t *builtins_lambda(cons_t *args, env_t *env)
 {
-    return NULL;
+    value_t *ret = value_init();
+    ret->type = V_PROCEDURE;
+
+
+    if (args == NULL || args->car == NULL
+        || args->cdr == NULL || args->cdr->car == NULL)
+        return NULL; // error
+
+    if (args->car->type != V_LIST || args->cdr->car->type != V_LIST)
+        return NULL; // error for now
+
+    // two lists, first is formals then body
+    // formal can be other that list
+    // body always list ??
+    ret->proc = procedure_make(args);
+
+    return ret;
 }
 
 value_t *builtins_define(cons_t *args, env_t *env)
@@ -229,10 +245,17 @@ value_t *builtins_define(cons_t *args, env_t *env)
         return NULL; // error
 
     // maybe make variables here to make easier read
-    hashmap_put(env->hm, args->car->str, args->cdr->car);
-    memcpy(ret, args->cdr->car, sizeof(value_t));
+    char *key = args->car->str;
+    value_t *val = args->cdr->car;
 
-    args->cdr->car = NULL;
+    // need to separate list and expression
+    if (val->type == V_LIST)
+        val = exec_expr(val->cons, env);
+
+    hashmap_put(env->hm, key, val);
+    memcpy(ret, val, sizeof(value_t));
+    // hashmap will free this
+    val = NULL;
     return ret;
 }
 

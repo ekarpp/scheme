@@ -21,13 +21,18 @@ typedef enum {
     V_PROCEDURE,
     V_BUILTIN
 } value_type;
-
+// maybe need V_EXPRESSION when we have lists implemented ??
 typedef value_t *(*builtin_t)(cons_t *, env_t *);
 
 struct cons_t {
     value_t *car;
     cons_t *cdr;
 };
+
+typedef struct {
+    cons_t *formals;
+    cons_t *body;
+} procedure_t;
 
 struct value_t {
     value_type type;
@@ -37,6 +42,7 @@ struct value_t {
         int b;
         builtin_t bif;
         cons_t *cons;
+        procedure_t *proc;
     };
 };
 
@@ -51,5 +57,9 @@ value_t *token_to_value(token_t *t);
 value_t *value_get(cons_t *cons, env_t *env);
 void value_output(value_t *val, env_t *env);
 void value_free(value_t *val);
+
+procedure_t *procedure_init(void);
+procedure_t *procedure_make(cons_t *args);
+void procedure_free(procedure_t *proc);
 
 #endif

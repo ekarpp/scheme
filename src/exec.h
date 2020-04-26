@@ -5,6 +5,6 @@
 #include "cons.h"
 
 value_t *exec_expr(cons_t *expr, env_t *env);
-
+value_t *exec_procedure(procedure_t *proc, cons_t *args, env_t *env);
 
 #endif

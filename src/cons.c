@@ -93,7 +93,6 @@ value_t *value_get(cons_t *cons, env_t *env)
         break;
     case V_LIST:
         val = exec_expr(val->cons, env);
-        cons_free(cons->car->cons);
         value_free(cons->car);
         cons->car = val;
         break;
@@ -150,8 +149,52 @@ void value_free(value_t *val)
 {
     if (val == NULL)
         return;
-    if ((val->type == V_IDENTIFIER || val->type == V_STRING)
-        && val->str)
-        free(val->str);
+    switch (val->type)
+    {
+    case V_IDENTIFIER: case V_STRING:
+        if (val->str)
+            free(val->str);
+        break;
+    case V_PROCEDURE:
+        procedure_free(val->proc);
+        break;
+    case V_LIST:
+        cons_free(val->cons);
+        break;
+    }
     free(val);
+}
+
+/* procedure */
+procedure_t *procedure_init(void)
+{
+    procedure_t *proc = malloc(sizeof(procedure_t));
+    if (proc == NULL)
+        return NULL; // error
+
+    proc->formals = NULL;
+    proc->body = NULL;
+
+    return proc;
+}
+
+// args has two lists
+// first is formals ( can also be other than list, fix later)
+// second is body
+procedure_t *procedure_make(cons_t *args)
+{
+    procedure_t *proc = procedure_init();
+    proc->formals = args->car->cons;
+    proc->body = args->cdr->car->cons;
+
+    args->car->cons = NULL;
+    args->cdr->car->cons = NULL;
+    return proc;
+}
+
+void procedure_free(procedure_t *proc)
+{
+    cons_free(proc->formals);
+    cons_free(proc->body);
+    free(proc);
 }

@@ -32,8 +32,7 @@ int parser_parse(parser_t *prsr, char *text)
 
     while (lxr->t->type != T_END)
     {
-        if (val)
-            value_free(val);
+        value_free(val);
         switch (lxr->t->type)
         {
         case '(':
