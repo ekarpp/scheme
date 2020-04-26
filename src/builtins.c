@@ -258,6 +258,10 @@ value_t *builtins_define(cons_t *args, env_t *env)
 
     hashmap_put(env->hm, key, val);
     memcpy(ret, val, sizeof(value_t));
+    // this is bad
+    // procedure, string, list dont get copied
+    // maybe set flag that it hsould not be freed?
+    // copying quite complicated
 
     return ret;
 }

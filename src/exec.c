@@ -20,12 +20,6 @@ value_t *exec_expr(cons_t *expr, env_t *env)
     case V_STRING: case V_IDENTIFIER:
         op = expr->car->str;
         f = env_get(env, op);
-        if (f->type == V_PROCEDURE)
-        {
-            value_t *tmp = value_init();
-            memcpy(tmp, f, sizeof(value_t));
-            f = tmp;
-        }
         break;
     case V_PROCEDURE:
         f = expr->car;
@@ -44,7 +38,8 @@ value_t *exec_expr(cons_t *expr, env_t *env)
             break;
         case V_PROCEDURE:
             ret = exec_procedure(f->proc, expr->cdr, env);
-            value_free(f);
+            if (expr->car->type != V_IDENTIFIER)
+                value_free(f);
             break;
         }
     }

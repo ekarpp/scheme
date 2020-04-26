@@ -156,7 +156,8 @@ void value_free(value_t *val)
             free(val->str);
         break;
     case V_PROCEDURE:
-        procedure_free(val->proc);
+        if (val->proc)
+            procedure_free(val->proc);
         break;
     case V_LIST:
         cons_free(val->cons);

@@ -39,7 +39,7 @@ struct value_t {
     union {
         long long lng;
         char *str;
-        int b;
+        char b;
         builtin_t bif;
         cons_t *cons;
         procedure_t *proc;

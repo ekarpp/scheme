@@ -32,7 +32,9 @@ int parser_parse(parser_t *prsr, char *text)
 
     while (lxr->t->type != T_END)
     {
-        value_free(val);
+        // fix
+        if (val && val->type != V_PROCEDURE)
+            value_free(val);
         switch (lxr->t->type)
         {
         case '(':
@@ -49,7 +51,9 @@ int parser_parse(parser_t *prsr, char *text)
         lexer_get_next_token(lxr);
     }
     value_output(val, prsr->env);
-    value_free(val);
+    // fix
+    if (val->type != V_PROCEDURE)
+        value_free(val);
 
     return 1;
 }
