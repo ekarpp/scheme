@@ -251,11 +251,14 @@ value_t *builtins_define(cons_t *args, env_t *env)
     // need to separate list and expression
     if (val->type == V_LIST)
         val = exec_expr(val->cons, env);
+    else
+        // hashmap will free this
+        args->cdr->car = NULL;
+
 
     hashmap_put(env->hm, key, val);
     memcpy(ret, val, sizeof(value_t));
-    // hashmap will free this
-    val = NULL;
+
     return ret;
 }
 
