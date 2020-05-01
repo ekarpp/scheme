@@ -32,8 +32,7 @@ int parser_parse(parser_t *prsr, char *text)
 
     while (lxr->t->type != T_END)
     {
-        // fix
-        if (val && val->type != V_PROCEDURE)
+        if (val)
             value_free(val);
         switch (lxr->t->type)
         {
@@ -51,9 +50,7 @@ int parser_parse(parser_t *prsr, char *text)
         lexer_get_next_token(lxr);
     }
     value_output(val, prsr->env);
-    // fix
-    if (val->type != V_PROCEDURE)
-        value_free(val);
+    value_free(val);
 
     return 1;
 }

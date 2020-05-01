@@ -36,6 +36,7 @@ typedef struct {
 
 struct value_t {
     value_type type;
+    char free;
     union {
         long long lng;
         char *str;

@@ -1,10 +1,12 @@
 #ifndef _HASHMAP_H
 #define _HASHMAP_H
 
+#include "cons.h"
+
 typedef struct {
     char *key;
     int hash;
-    void *value;
+    value_t *value;
 } hashmap_element_t;
 
 typedef struct {
@@ -17,8 +19,8 @@ typedef struct {
 
 int hashmap_increment(int i, int size);
 
-int hashmap_hash(char *string);
-void hashmap_put(hashmap_t *hm, char *key, void *value);
+int hashmap_hash(const char *string);
+void hashmap_put(hashmap_t *hm, const char *key, value_t *value);
 void hashmap_insert(hashmap_element_t **arr, int size, hashmap_element_t *e);
 void hashmap_resize(hashmap_t *hm);
 void *hashmap_get(hashmap_t *hm, char *key);

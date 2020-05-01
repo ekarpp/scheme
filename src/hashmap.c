@@ -2,6 +2,7 @@
 #include <stddef.h>
 #include <string.h>
 
+#include "cons.h"
 #include "hashmap.h"
 
 #define INITIAL_SIZE 64
@@ -13,7 +14,7 @@ inline int hashmap_increment(int i, int size)
 }
 
 
-int hashmap_hash(char *string)
+int hashmap_hash(const char *string)
 {
     int sum = 0;
     int i = 0;
@@ -25,10 +26,11 @@ int hashmap_hash(char *string)
     return sum;
 }
 
-void hashmap_put(hashmap_t *hm, char *key, void *value)
+void hashmap_put(hashmap_t *hm, const char *key, value_t *value)
 {
     const int hash = hashmap_hash(key);
     hashmap_element_t *hme = malloc(sizeof(hashmap_element_t));
+    value->free = 0;
     hme->value = value;
     hme->key = malloc(strlen(key) + 1);
     strcpy(hme->key, key);
@@ -94,7 +96,8 @@ hashmap_t *hashmap_init(void)
 void hashmap_free_element(hashmap_element_t *hme)
 {
     free(hme->key);
-    free(hme->value);
+    hme->value->free = 1;
+    value_free(hme->value);
     free(hme);
 }
 

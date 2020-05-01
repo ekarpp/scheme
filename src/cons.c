@@ -50,7 +50,7 @@ value_t *value_init(void)
     value_t *val = malloc(sizeof(value_t));
     if (val == NULL)
         return NULL; // todo: handle better
-
+    val->free = 1;
     return val;
 }
 
@@ -85,16 +85,12 @@ value_t *value_get(cons_t *cons, env_t *env)
     switch (val->type)
     {
     case V_IDENTIFIER:
-        tmp = env_get(env, val->str);
-        val = value_init();
-        memcpy(val, tmp, sizeof(value_t));
-        value_free(cons->car);
-        cons->car = val;
+        // maybe bug here
+        val = env_get(env, val->str);
         break;
     case V_LIST:
+        // maybe bug here
         val = exec_expr(val->cons, env);
-        value_free(cons->car);
-        cons->car = val;
         break;
     }
     return val;
@@ -147,7 +143,7 @@ void value_output(value_t *val, env_t *env)
 
 void value_free(value_t *val)
 {
-    if (val == NULL)
+    if (val == NULL || val->free == 0)
         return;
     switch (val->type)
     {

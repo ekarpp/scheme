@@ -40,10 +40,5 @@ env_t *env_pop(env_t *env)
 void env_free(env_t *env)
 {
     while (env)
-    {
-        hashmap_free(env->hm);
-        env_t *tmp = env->next;
-        free(env);
-        env = tmp;
-    }
+        env = env_pop(env);
 }
