@@ -83,7 +83,7 @@ cons_t *parser_expression(parser_t *prsr)
                 break;
             case '(':
                 last->car = value_init();
-                last->car->type = V_LIST;
+                last->car->type = V_EXPRESSION;
                 last->car->cons = parser_expression(prsr);
         }
         lexer_get_next_token(lxr);

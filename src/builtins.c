@@ -233,7 +233,7 @@ value_t *builtins_lambda(cons_t *args, env_t *env)
         || args->cdr == NULL || args->cdr->car == NULL)
         return NULL; // error
 
-    if (args->car->type != V_LIST || args->cdr->car->type != V_LIST)
+    if (args->car->type != V_EXPRESSION || args->cdr->car->type != V_EXPRESSION)
         return NULL; // error for now
 
     // two lists, first is formals then body
@@ -256,7 +256,7 @@ value_t *builtins_define(cons_t *args, env_t *env)
     value_t *val = args->cdr->car;
     //exec_eval(args->cdr, env); // this should replace next lines ??
     // need to separate list and expression
-    if (val->type == V_LIST)
+    if (val->type == V_EXPRESSION)
         val = exec_expr(val->cons, env);
     else
         // hashmap will free this

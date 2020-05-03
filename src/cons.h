@@ -19,7 +19,8 @@ typedef enum {
     V_BOOL,
     V_LIST,
     V_PROCEDURE,
-    V_BUILTIN
+    V_BUILTIN,
+    V_EXPRESSION
 } value_type;
 // maybe need V_EXPRESSION when we have lists implemented ??
 typedef value_t *(*builtin_t)(cons_t *, env_t *);

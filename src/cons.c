@@ -92,7 +92,7 @@ value_t *value_get(value_t *val, env_t *env)
 value_t *empty_list(void)
 {
     value_t *l = value_init();
-    l->type = V_LIST;
+    l->type = V_EXPRESSION;
     l->cons = NULL;
     return l;
 }
@@ -128,7 +128,7 @@ void value_output(value_t *val, env_t *env)
     case V_LIST:
         cons_output(val->cons, env);
         break;
-    case V_PROCEDURE: case V_BUILTIN:
+    case V_PROCEDURE: case V_BUILTIN: case V_EXPRESSION:
         break;
 
     }
@@ -148,7 +148,7 @@ void value_free(value_t *val)
         if (val->proc)
             procedure_free(val->proc);
         break;
-    case V_LIST:
+    case V_LIST: case V_EXPRESSION:
         cons_free(val->cons);
         break;
     }

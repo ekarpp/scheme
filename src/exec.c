@@ -23,7 +23,7 @@ value_t *exec_expr(cons_t *expr, env_t *env)
     case V_PROCEDURE:
         f = expr->car;
         break;
-    case V_LIST:
+    case V_EXPRESSION:
         f = exec_expr(expr->car->cons, env);
         break;
     }
@@ -72,7 +72,7 @@ value_t *exec_procedure(procedure_t *proc, cons_t *args, env_t *env)
 
 void exec_eval(cons_t *arg, env_t *env)
 {
-    if (arg->car->type == V_LIST)
+    if (arg->car->type == V_EXPRESSION)
     {
         value_t *val = exec_expr(arg->car->cons, env);
         value_free(arg->car);
