@@ -7,7 +7,7 @@
 
 value_t *exec_expr(cons_t *expr, env_t *env)
 {
-    if (expr->cdr == NULL)
+    if (expr->car == NULL && expr->cdr == NULL)
         return empty_list();
 
     value_t *ret = NULL;
