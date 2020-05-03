@@ -9,6 +9,7 @@ typedef struct {
 
 
 interpretor_t *interpretor_init(void);
-int interpret(interpretor_t *interp, char *text);
+void interpret_file(interpretor_t *interp, char *fname);
+int interpret_text(interpretor_t *interp, char *text);
 void interpretor_free(interpretor_t *interp);
 #endif
