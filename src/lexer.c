@@ -159,8 +159,7 @@ int lexer_hashtag(lexer_t *lxr)
 
 int lexer_string(lexer_t *lxr)
 {
-    if (lexer_add(lxr, 1) == 0)
-        return 0;
+    *lxr->curr++;
     int reti = 1;
     while (*lxr->curr != '"')
     {
@@ -188,7 +187,7 @@ int lexer_string(lexer_t *lxr)
                     return 0;
         }
     }
-    reti = lexer_add(lxr, 1);
+    *lxr->curr++;
     return reti;
 }
 
