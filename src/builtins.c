@@ -16,7 +16,8 @@ value_t *builtins_add(cons_t *args, env_t *env)
 
     while (args)
     {
-        value_t *arg = value_get(args, env);
+        exec_eval(args, env);
+        value_t *arg = value_get(args->car, env);
         if (arg->type != V_LONG)
             break;// error
 
@@ -36,7 +37,8 @@ value_t *builtins_multiply(cons_t *args, env_t *env)
 
     while (args)
     {
-        value_t *arg = value_get(args, env);
+        exec_eval(args, env);
+        value_t *arg = value_get(args->car, env);
         if (arg->type != V_LONG)
             break;// error
 
@@ -55,8 +57,8 @@ value_t *builtins_subtract(cons_t *args, env_t *env)
 
     if (args == NULL)
         return NULL;// error
-
-    value_t *arg = value_get(args, env);
+    exec_eval(args, env);
+    value_t *arg = value_get(args->car, env);
     if (arg->type != V_LONG)
         return NULL; // error
 
@@ -67,7 +69,8 @@ value_t *builtins_subtract(cons_t *args, env_t *env)
     args = args->cdr;
     while (args)
     {
-        arg = value_get(args, env);
+        exec_eval(args, env);
+        arg = value_get(args->car, env);
         if (arg->type != V_LONG)
             break;// error
         ret->lng -= arg->lng;
@@ -85,8 +88,8 @@ value_t *builtins_divide(cons_t *args, env_t *env)
 
     if (args == NULL)
         return NULL;// error
-
-    value_t *arg = value_get(args, env);
+    exec_eval(args, env);
+    value_t *arg = value_get(args->car, env);
 
     ret->lng = arg->lng;
     if (args->cdr == NULL)
@@ -95,7 +98,8 @@ value_t *builtins_divide(cons_t *args, env_t *env)
     args = args->cdr;
     while (args)
     {
-        arg = value_get(args, env);
+        exec_eval(args, env);
+        arg = value_get(args->car, env);
         // type check
         ret->lng /= arg->lng;
         args = args->cdr;
@@ -112,7 +116,8 @@ value_t *builtins_abs(cons_t *args, env_t *env)
     if (args == NULL)
         return NULL;// error
 
-    value_t *arg = value_get(args, env);
+    exec_eval(args, env);
+    value_t *arg = value_get(args->car, env);
 
     if (arg->type != V_LONG)
         return NULL;// error
@@ -154,14 +159,16 @@ value_t *builtins_cmp(cons_t *args, char op, env_t *env)
     if (args == NULL || args->cdr == NULL)
         return NULL;//invalid amount of arg error
 
-    value_t *prev = value_get(args, env);
+    exec_eval(args, env);
+    value_t *prev = value_get(args->car, env);
     if (prev->type != V_LONG)
         return NULL; //invalid type error
 
     args = args->cdr;
     while (args && ret->b)
     {
-        value_t *curr = value_get(args, env);
+        exec_eval(args, env);
+        value_t *curr = value_get(args->car, env);
         if (curr->type != V_LONG)
             break;// error
         switch (op)
@@ -247,7 +254,7 @@ value_t *builtins_define(cons_t *args, env_t *env)
     // maybe make variables here to make easier read
     char *key = args->car->str;
     value_t *val = args->cdr->car;
-
+    //exec_eval(args->cdr, env); // this should replace next lines ??
     // need to separate list and expression
     if (val->type == V_LIST)
         val = exec_expr(val->cons, env);

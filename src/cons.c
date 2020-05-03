@@ -78,20 +78,13 @@ value_t *token_to_value(token_t *t)
     return val;
 }
 
-value_t *value_get(cons_t *cons, env_t *env)
+value_t *value_get(value_t *val, env_t *env)
 {
-    value_t *val = cons->car;
-    value_t *tmp;
     switch (val->type)
     {
     case V_IDENTIFIER:
-        // maybe bug here
         val = env_get(env, val->str);
-        break;
-    case V_LIST:
-        // maybe bug here
-        val = exec_expr(val->cons, env);
-        break;
+        return value_get(val, env);
     }
     return val;
 }

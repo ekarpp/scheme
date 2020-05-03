@@ -50,21 +50,32 @@ value_t *exec_procedure(procedure_t *proc, cons_t *args, env_t *env)
     env = env_add(env);
     cons_t *formals = proc->formals;
     cons_t *arg = args;
+
     while (formals)
     {
         value_t *formal = formals->car;
         if (formal->type != V_IDENTIFIER || arg->car == NULL)
             return NULL; // error
-
+        exec_eval(arg, env);
         hashmap_put(env->hm, formal->str, arg->car);
         arg = arg->cdr;
         formals = formals->cdr;
     }
-    // here ?????
+
     value_t *ret = exec_expr(proc->body, env);
     env = env_pop(env);
     // env_pop free'd these
     args->car = NULL;
     args->cdr = NULL;
     return ret;
+}
+
+void exec_eval(cons_t *arg, env_t *env)
+{
+    if (arg->car->type == V_LIST)
+    {
+        value_t *val = exec_expr(arg->car->cons, env);
+        value_free(arg->car);
+        arg->car = val;
+    }
 }

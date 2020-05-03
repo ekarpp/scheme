@@ -55,7 +55,7 @@ long long str_to_long(char *str);
 value_t *value_init(void);
 value_t *empty_list(void);
 value_t *token_to_value(token_t *t);
-value_t *value_get(cons_t *cons, env_t *env);
+value_t *value_get(value_t *val, env_t *env);
 void value_output(value_t *val, env_t *env);
 void value_free(value_t *val);
 
