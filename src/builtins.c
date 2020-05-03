@@ -274,6 +274,13 @@ value_t *builtins_define(cons_t *args, env_t *env)
     return ret;
 }
 
+value_t *builtins_print(cons_t *args, env_t *env)
+{
+    exec_eval(args, env);
+    value_output(args->car, env);
+    return empty_list();
+}
+
 void builtins_add_f(hashmap_t *hm, char *key, builtin_t f)
 {
     value_t *val = value_init();
@@ -297,4 +304,5 @@ void builtins_add_all_fs(env_t *env)
     builtins_add_f(env->hm, ">=", builtins_non_decreasing);
     builtins_add_f(env->hm, "lambda", builtins_lambda);
     builtins_add_f(env->hm, "define", builtins_define);
+    builtins_add_f(env->hm, "print", builtins_print);
 }
