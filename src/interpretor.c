@@ -16,8 +16,14 @@ void interpret_file(interpretor_t *interp, char *fname)
     FILE *f = fopen(fname, "r");
     if (f == NULL)
         return;
-    char txt[1000];
-    fgets(txt, 1000, f);
+
+    fseek(f, 0, SEEK_END);
+    long unsigned int len = ftell(f);
+    rewind(f);
+
+    char *txt = malloc(len);
+    if (len != fread(txt, 1, 1000, f))
+        printf("ERR\n");
     fclose(f);
     interpret_text(interp, txt);
 }

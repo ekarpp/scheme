@@ -1,1 +1,5 @@
-(+ 1 1 1)
+(print "should be 16\n")
+(define a 10)
+(define b 2)
+(print (+ a (* 3 b)))
+(print "\n")
