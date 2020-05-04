@@ -84,7 +84,7 @@ value_t *value_get(value_t *val, env_t *env)
     {
     case V_IDENTIFIER:
         val = env_get(env, val->str);
-        return value_get(val, env);// check for null
+        return (val == NULL) ? val : value_get(val, env);
     }
     return val;
 }

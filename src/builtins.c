@@ -276,8 +276,12 @@ value_t *builtins_define(cons_t *args, env_t *env)
 
 value_t *builtins_print(cons_t *args, env_t *env)
 {
-    exec_eval(args, env);
-    value_output(args->car, env);
+    while (args)
+    {
+        exec_eval(args, env);
+        value_output(args->car, env);
+        args = args->cdr;
+    }
     return empty_list();
 }
 

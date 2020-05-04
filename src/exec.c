@@ -57,8 +57,8 @@ value_t *exec_procedure(procedure_t *proc, cons_t *args, env_t *env)
         if (formal->type != V_IDENTIFIER || arg->car == NULL)
             return NULL; // error
         exec_eval(arg, env);
-        value_t *v = value_get(arg->car, env);
-        if (v == arg->car)
+        value_t *v = value_get(formal, env);
+        if (v == NULL || v == arg->car)
             hashmap_put(env->hm, formal->str, arg->car);
         arg = arg->cdr;
         formals = formals->cdr;
