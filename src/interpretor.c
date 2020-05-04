@@ -26,6 +26,7 @@ void interpret_file(interpretor_t *interp, char *fname)
         printf("ERR\n");
     fclose(f);
     interpret_text(interp, txt);
+    free(txt);
 }
 
 int interpret_text(interpretor_t *interp, char *text)
