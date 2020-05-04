@@ -1,3 +1,5 @@
+(print "lambda.scm\n")
+
 (define f (lambda (x) (+ x)))
 (define g (lambda (y) (* y (f y))))
 
