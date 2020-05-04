@@ -51,8 +51,13 @@ int hashmap_insert(hashmap_element_t **arr, int size, hashmap_element_t *e)
             break;
         i = hashmap_increment(i, size);
     }
-    // if arr[i] exists, increase amount by zero otherwise by one
-    int ret = arr[i] ? 0 : 1;
+
+    int ret = 0;
+    if (arr[i])
+    {
+        ret++;
+        hashmap_free_element(arr[i]);
+    }
     arr[i] = e;
     return ret;
 }
