@@ -36,13 +36,12 @@ void hashmap_put(hashmap_t *hm, const char *key, value_t *value)
     hme->key = malloc(strlen(key) + 1);
     strcpy(hme->key, key);
     hme->hash = hash;
-    hashmap_insert(hm->arr, hm->size, hme);
-    hm->used++;
+    hm->used += hashmap_insert(hm->arr, hm->size, hme);
     if (hm->used >= hm->lim)
         hashmap_resize(hm);
 }
 
-void hashmap_insert(hashmap_element_t **arr, int size, hashmap_element_t *e)
+int hashmap_insert(hashmap_element_t **arr, int size, hashmap_element_t *e)
 {
     int i = e->hash % size;
     while (arr[i])
@@ -52,7 +51,10 @@ void hashmap_insert(hashmap_element_t **arr, int size, hashmap_element_t *e)
             break;
         i = hashmap_increment(i, size);
     }
+    // if arr[i] exists, increase amount by zero otherwise by one
+    int ret = arr[i] ? 0 : 1;
     arr[i] = e;
+    return ret;
 }
 
 
