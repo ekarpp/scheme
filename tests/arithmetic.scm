@@ -1,4 +1,4 @@
-(print "arithmetic.scm\n")
+(print "\narithmetic.scm\n")
 
 (define a 10)
 (define b 2)

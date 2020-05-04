@@ -1,4 +1,4 @@
-(print "define.scm\n")
+(print "\ndefine.scm\n")
 
 (define v 10)
 (print "should be 10: " v "\n")
