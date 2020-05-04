@@ -247,13 +247,11 @@ value_t *builtins_lambda(cons_t *args, env_t *env)
 value_t *builtins_define(cons_t *args, env_t *env)
 {
     value_t *ret = NULL;
-
-    if (args->car->type != V_IDENTIFIER)
+    value_t *key = args->car;
+    value_t *val = args->cdr->car;
+    if (key->type != V_IDENTIFIER)
         return NULL; // error
 
-    // maybe make variables here to make easier read
-    char *key = args->car->str;
-    value_t *val = args->cdr->car;
     //exec_eval(args->cdr, env); // this should replace next lines ??
     // need to separate list and expression
     if (val->type == V_EXPRESSION)
@@ -263,7 +261,7 @@ value_t *builtins_define(cons_t *args, env_t *env)
         args->cdr->car = NULL;
 
 
-    hashmap_put(env->hm, key, val);
+    hashmap_put(env->hm, key->str, val);
 
     ret = val;
     // this is bad
