@@ -64,7 +64,7 @@ int lexer_add(lexer_t *lxr, int n)
 int lexer_add_char(lexer_t *lxr, char c)
 {
     int reti = 1;
-    if (lxr->t->size + 1 > lxr->t->len)
+    if (lxr->t->size + 1 >= lxr->t->len)
         reti = lexer_resize(lxr);
     lxr->curr += 2;
     lxr->t->lexeme[lxr->t->size] = c;
