@@ -15,16 +15,17 @@ void interpret_file(interpretor_t *interp, char *fname)
 {
     FILE *f = fopen(fname, "r");
     if (f == NULL)
-        return;
+    {printf("%s not found\n", fname); return;}
 
     fseek(f, 0, SEEK_END);
     long unsigned int len = ftell(f);
     rewind(f);
 
-    char *txt = malloc(len);
-    if (len != fread(txt, 1, 1000, f))
+    char *txt = malloc(len + 1);
+    if (len != fread(txt, 1, len, f))
         printf("ERR\n");
     fclose(f);
+    txt[len] = '\0';
     interpret_text(interp, txt);
     free(txt);
 }
