@@ -1,5 +1,4 @@
 (print "\narithmetic.scm\n")
 
-(define a 10)
-(define b 2)
-(print "should be 16: " (+ a (* 3 b)) "\n")
+(print "should be 16: " (+ 10 (* 3 2)) "\n")
+(print "should be 6: " (- 10 (+) (*) (* 3)) "\n")
