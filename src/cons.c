@@ -43,6 +43,24 @@ long long str_to_lng(char *str)
     return l;
 }
 
+/* expression */
+expression_t *expression_init(void)
+{
+    expression_t *expr = malloc(sizeof(expression_t));
+    if (expr == NULL)
+        return NULL;
+    expr->body = NULL;
+    expr->val = NULL;
+    return expr;
+}
+
+void expression_free(expression_t *expr)
+{
+    cons_free(expr->body);
+    value_free(expr->val);
+    free(expr);
+}
+
 /* value */
 
 value_t *value_init(void)
@@ -92,7 +110,7 @@ value_t *value_get(value_t *val, env_t *env)
 value_t *empty_list(void)
 {
     value_t *l = value_init();
-    l->type = V_EXPRESSION;
+    l->type = V_LIST;
     l->cons = NULL;
     return l;
 }
@@ -148,8 +166,11 @@ void value_free(value_t *val)
         if (val->proc)
             procedure_free(val->proc);
         break;
-    case V_LIST: case V_EXPRESSION:
+    case V_LIST:
         cons_free(val->cons);
+        break;
+    case V_EXPRESSION:
+        expression_free(val->expr);
         break;
     }
     free(val);
@@ -163,7 +184,7 @@ procedure_t *procedure_init(void)
         return NULL; // error
 
     proc->formals = NULL;
-    proc->body = NULL;
+    proc->expr = NULL;
 
     return proc;
 }
@@ -175,7 +196,8 @@ procedure_t *procedure_make(cons_t *args)
 {
     procedure_t *proc = procedure_init();
     proc->formals = args->car->cons;
-    proc->body = args->cdr->car->cons;
+    //proc->expr = expression_init();
+    proc->expr = args->cdr->car->expr;
 
     args->car->cons = NULL;
     args->cdr->car->cons = NULL;
@@ -185,6 +207,6 @@ procedure_t *procedure_make(cons_t *args)
 void procedure_free(procedure_t *proc)
 {
     cons_free(proc->formals);
-    cons_free(proc->body);
+    expression_free(proc->expr);
     free(proc);
 }

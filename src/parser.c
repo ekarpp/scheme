@@ -28,7 +28,7 @@ int parser_parse(parser_t *prsr, char *text)
     lxr->curr = text;
     lexer_get_next_token(lxr);
     value_t *val = NULL;
-    cons_t *expr;
+    expression_t *expr;
 
     while (lxr->t->type != T_END)
     {
@@ -38,8 +38,10 @@ int parser_parse(parser_t *prsr, char *text)
         {
         case '(':
             expr = parser_expression(prsr);
-            val = exec_expr(expr, prsr->env);
-            cons_free(expr);
+            exec_expr(expr, prsr->env);
+            val = expr->val;
+            expr->val = NULL;
+            expression_free(expr);
             break;
         case T_LONG: case T_STRING: case T_IDENTIFIER:
             val = token_to_value(lxr->t);
@@ -56,18 +58,21 @@ int parser_parse(parser_t *prsr, char *text)
 }
 
 /* parses an expression (expr) */
-cons_t *parser_expression(parser_t *prsr)
+expression_t *parser_expression(parser_t *prsr)
 {
     lexer_t *lxr = prsr->lxr;
     lexer_get_next_token(lxr);
 
-    cons_t *expr = cons_init();
+    expression_t *expr = expression_init();
     /* parse arguments */
     cons_t *last = NULL;
     while (lxr->t->type != ')')
     {
         if (last == NULL)
-            last = expr;
+        {
+            expr->body = cons_init();
+            last = expr->body;
+        }
         else
         {
             last->cdr = cons_init();
@@ -84,7 +89,7 @@ cons_t *parser_expression(parser_t *prsr)
             case '(':
                 last->car = value_init();
                 last->car->type = V_EXPRESSION;
-                last->car->cons = parser_expression(prsr);
+                last->car->expr = parser_expression(prsr);
         }
         lexer_get_next_token(lxr);
     }

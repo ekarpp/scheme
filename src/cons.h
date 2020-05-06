@@ -22,7 +22,7 @@ typedef enum {
     V_BUILTIN,
     V_EXPRESSION
 } value_type;
-// maybe need V_EXPRESSION when we have lists implemented ??
+
 typedef value_t *(*builtin_t)(cons_t *, env_t *);
 
 struct cons_t {
@@ -31,8 +31,13 @@ struct cons_t {
 };
 
 typedef struct {
-    cons_t *formals;
     cons_t *body;
+    value_t *val;
+} expression_t;
+
+typedef struct {
+    cons_t *formals;
+    expression_t *expr;
 } procedure_t;
 
 struct value_t {
@@ -45,12 +50,16 @@ struct value_t {
         builtin_t bif;
         cons_t *cons;
         procedure_t *proc;
+        expression_t *expr;
     };
 };
 
 cons_t *cons_init(void);
 void cons_output(cons_t *cons, env_t *env);
 void cons_free(cons_t *cons);
+
+expression_t *expression_init(void);
+void expression_free(expression_t *expr);
 
 long long str_to_long(char *str);
 value_t *value_init(void);

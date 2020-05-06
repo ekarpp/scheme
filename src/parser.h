@@ -13,7 +13,7 @@ typedef struct {
 
 parser_t *parser_init(void);
 int parser_parse(parser_t *prsr, char *text);
-cons_t *parser_expression(parser_t *prsr);
+expression_t *parser_expression(parser_t *prsr);
 
 void parser_free(parser_t *prsr);
 #endif
