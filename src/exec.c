@@ -32,6 +32,7 @@ int exec_expr(expression_t *expr, env_t *env)
     case V_EXPRESSION:
         exec_expr(body->car->expr, env);
         f = body->car->expr->val;
+        body->car->expr->val = NULL;
         // env_get here ??
         break;
     }
@@ -45,7 +46,7 @@ int exec_expr(expression_t *expr, env_t *env)
             break;
         case V_PROCEDURE:
             expr->val = exec_procedure(f->proc, body->cdr, env);
-            value_free(f);// when does this get free'd ??
+            value_free(f);
             break;
         }
     }
@@ -69,6 +70,7 @@ value_t *exec_procedure(procedure_t *proc, cons_t *args, env_t *env)
         {
             exec_expr(tmp->expr, env);
             tmp = tmp->expr->val;
+            arg->car->expr->val = NULL;
         }
         // what is happening here
         value_t *v = value_get(formal, env);
@@ -80,6 +82,7 @@ value_t *exec_procedure(procedure_t *proc, cons_t *args, env_t *env)
     }
     exec_expr(proc->expr, env);
     value_t *ret = proc->expr->val;
+    proc->expr->val = NULL;
     env = env_pop(env);
     // env_pop free'd these
     args->car = NULL;
