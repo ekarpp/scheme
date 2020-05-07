@@ -56,6 +56,8 @@ expression_t *expression_init(void)
 
 void expression_free(expression_t *expr)
 {
+    if (expr == NULL)
+        return;
     cons_free(expr->body);
     value_free(expr->val);
     free(expr);
@@ -192,15 +194,15 @@ procedure_t *procedure_init(void)
 // args has two lists
 // first is formals ( can also be other than list, fix later)
 // second is body
-procedure_t *procedure_make(cons_t *args)
+procedure_t *procedure_make(value_t *formals, value_t *body)
 {
     procedure_t *proc = procedure_init();
-    proc->formals = args->car->cons;
-    //proc->expr = expression_init();
-    proc->expr = args->cdr->car->expr;
+    proc->formals = formals->expr->body;
+    formals->expr->body = NULL;
 
-    args->car->cons = NULL;
-    args->cdr->car->cons = NULL;
+    proc->expr = body->expr;
+    body->expr = NULL;
+
     return proc;
 }
 

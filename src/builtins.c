@@ -216,21 +216,27 @@ value_t *builtins_non_decreasing(cons_t *args, env_t *env)
 
 value_t *builtins_lambda(cons_t *args, env_t *env)
 {
+
+
+
+    if (args == NULL || args->car == NULL)
+        return NULL;
+
+    if  (args->cdr == NULL || args->cdr->car == NULL)
+        return NULL; // error
+    value_t *formals = args->car;
+    value_t *body = args->cdr->car;
+
+    if (formals->type != V_EXPRESSION || body->type != V_EXPRESSION)
+        return NULL; // error for now
+
     value_t *ret = value_init();
     ret->type = V_PROCEDURE;
-
-
-    if (args == NULL || args->car == NULL
-        || args->cdr == NULL || args->cdr->car == NULL)
-        return NULL; // error
-
-    if (args->car->type != V_EXPRESSION || args->cdr->car->type != V_EXPRESSION)
-        return NULL; // error for now
 
     // two lists, first is formals then body
     // formal can be other that list
     // body always list ??
-    ret->proc = procedure_make(args);
+    ret->proc = procedure_make(formals, body);
 
     return ret;
 }

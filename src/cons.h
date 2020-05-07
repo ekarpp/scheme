@@ -70,7 +70,7 @@ void value_output(value_t *val, env_t *env);
 void value_free(value_t *val);
 
 procedure_t *procedure_init(void);
-procedure_t *procedure_make(cons_t *args);
+procedure_t *procedure_make(value_t *formals, value_t *body);
 void procedure_free(procedure_t *proc);
 
 #endif
