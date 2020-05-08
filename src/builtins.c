@@ -278,6 +278,48 @@ value_t *builtins_print(cons_t *args, env_t *env)
     return empty_list();
 }
 
+value_t *builtins_begin(cons_t *args, env_t *env)
+{
+    if (args == NULL)
+        return empty_list();
+    value_t *ret;
+    value_t *prev;
+    while (args)
+    {
+        value_t *arg = args->car;
+        if (arg->type != V_EXPRESSION)
+            return NULL; // error
+        ret = exec_eval(arg, env);
+        prev = arg;
+        args = args->cdr;
+    }
+    prev->expr->val = NULL;
+    return ret;
+}
+
+value_t *builtins_if(cons_t *args, env_t *env)
+{
+    value_t *ret;
+    value_t *bool = exec_eval(args->car, env);
+    if (bool->type != V_BOOL)
+        return NULL;
+
+    cons_t *tru = args->cdr;
+    cons_t *fals = tru->cdr;
+
+    value_t *val = (bool->b) ? tru->car : fals->car;
+
+    if (val->type == V_EXPRESSION)
+    {
+        ret = exec_eval(val, env);
+        val->expr->val = NULL;
+    }
+    else
+        ret = value_copy(val);
+
+    return ret;
+}
+
 void builtins_add_f(hashmap_t *hm, char *key, builtin_t f)
 {
     value_t *val = value_init();
@@ -302,4 +344,6 @@ void builtins_add_all_fs(env_t *env)
     builtins_add_f(env->hm, "lambda", builtins_lambda);
     builtins_add_f(env->hm, "define", builtins_define);
     builtins_add_f(env->hm, "print", builtins_print);
+    builtins_add_f(env->hm, "begin", builtins_begin);
+    builtins_add_f(env->hm, "if", builtins_if);
 }

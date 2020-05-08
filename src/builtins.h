@@ -22,6 +22,8 @@ value_t *builtins_non_decreasing(cons_t *args, env_t *env);
 value_t *builtins_define(cons_t *args, env_t *env);
 value_t *builtins_lambda(cons_t *args, env_t *env);
 value_t *builtins_print(cons_t *args, env_t *env);
+value_t *builtins_begin(cons_t *args, env_t *env);
+value_t *builtins_if(cons_t *args, env_t *env);
 
 void builtins_add_f(hashmap_t *hm, char *key, builtin_t f);
 void builtins_add_all_fs(env_t *env);
