@@ -29,6 +29,14 @@ void cons_free(cons_t *cons)
     }
 }
 
+cons_t *cons_copy(cons_t *cons)
+{
+    cons_t *ret = cons_init();
+    ret->car = value_copy(cons->car);
+    ret->cdr = cons_copy(cons->cdr);
+    return ret;
+}
+
 /* helper for token_to_value */
 long long str_to_lng(char *str)
 {
@@ -107,6 +115,46 @@ value_t *value_get(value_t *val, env_t *env)
         return (val == NULL) ? val : value_get(val, env);
     }
     return val;
+}
+
+value_t *value_copy(value_t *val)
+{
+    value_t *ret = value_init();
+    ret->type = val->type;
+
+    switch (val->type)
+    {
+    case V_LONG:
+        ret->lng = val->lng;
+        break;
+    case V_BOOL:
+        ret->b = val->b;
+        break;
+    case V_BUILTIN:
+        ret->bif = val->bif;
+        break;
+    case V_LIST:
+        ret->cons = cons_copy(val->cons);
+        break;
+    case V_IDENTIFIER: case V_STRING:
+        ret->str = malloc(strlen(val->str) + 1);
+        strcpy(ret->str, val->str);
+        break;
+    case V_EXPRESSION:
+        ret->expr = expression_init();
+        ret->expr->val = value_copy(val->expr->val);
+        ret->expr->body = cons_copy(val->expr->body);
+        break;
+    case V_PROCEDURE:
+        ret->proc = procedure_init();
+        ret->proc->formals = cons_copy(val->proc->formals);
+        ret->proc->expr = expression_init();
+        ret->proc->expr->val = value_copy(val->proc->expr->val);
+        ret->proc->expr->body = cons_copy(val->proc->expr->body);
+        break;
+    }
+
+    return ret;
 }
 
 value_t *empty_list(void)

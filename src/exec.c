@@ -69,13 +69,19 @@ value_t *exec_procedure(procedure_t *proc, cons_t *args, env_t *env)
         if (tmp->type == V_EXPRESSION)
         {
             exec_expr(tmp->expr, env);
+            // value_get
             tmp = tmp->expr->val;
             arg->car->expr->val = NULL;
         }
-        // what is happening here
-        value_t *v = value_get(formal, env);
-        if (v == NULL || v == tmp)
-            hashmap_put(env->hm, formal->str, tmp);
+        else
+        {
+            tmp = value_get(tmp, env);
+            tmp = value_copy(tmp);
+        }
+
+        //value_t *v = value_get(formal, env);
+        //if (v == NULL || v == tmp)
+        hashmap_put(env->hm, formal->str, tmp);
 
         arg = arg->cdr;
         formals = formals->cdr;
@@ -84,9 +90,7 @@ value_t *exec_procedure(procedure_t *proc, cons_t *args, env_t *env)
     value_t *ret = proc->expr->val;
     proc->expr->val = NULL;
     env = env_pop(env);
-    // env_pop free'd these
-    args->car = NULL;
-    args->cdr = NULL;
+
     return ret;
 }
 

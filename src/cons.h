@@ -57,12 +57,14 @@ struct value_t {
 cons_t *cons_init(void);
 void cons_output(cons_t *cons, env_t *env);
 void cons_free(cons_t *cons);
+cons_t *cons_copy(cons_t *cons);
 
 expression_t *expression_init(void);
 void expression_free(expression_t *expr);
 
 long long str_to_long(char *str);
 value_t *value_init(void);
+value_t *value_copy(value_t *val);
 value_t *empty_list(void);
 value_t *token_to_value(token_t *t);
 value_t *value_get(value_t *val, env_t *env);
