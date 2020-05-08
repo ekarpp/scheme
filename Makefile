@@ -13,5 +13,11 @@ tests: $(PROG)
 		./scheme tests/$$t; \
 	done
 
+
+valgrind: $(PROG)
+	for t in $(shell ls tests); do \
+		valgrind ./scheme tests/$$t; \
+	done
+
 clean:
 	rm -f $(PROG) *.o
