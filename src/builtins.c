@@ -245,13 +245,13 @@ value_t *builtins_define(cons_t *args, env_t *env)
 {
     value_t *ret = NULL;
     value_t *key = args->car;
-        if (key->type != V_IDENTIFIER)
+    if (key->type != V_IDENTIFIER)
         return NULL; // error
 
     //exec_eval(args->cdr, env); // this should replace next lines ??
     value_t *val = exec_eval(args->cdr->car, env);
 
-    if (val->type != V_EXPRESSION)
+    if (args->cdr->car->type != V_EXPRESSION)
         // hashmap will free this
         args->cdr->car = NULL;
 
