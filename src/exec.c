@@ -8,7 +8,10 @@
 int exec_expr(expression_t *expr, env_t *env)
 {
     if (expr->val != NULL)
+    {
         value_free(expr->val);
+        expr->val = NULL;
+    }
 
     cons_t *body = expr->body;
     if (body->car == NULL && body->cdr == NULL)
@@ -37,6 +40,7 @@ int exec_expr(expression_t *expr, env_t *env)
         break;
     }
 
+    value_t *tmp;
     if (f)
     {
         switch (f->type)
@@ -45,7 +49,12 @@ int exec_expr(expression_t *expr, env_t *env)
             expr->val = f->bif(body->cdr, env);
             break;
         case V_PROCEDURE:
-            expr->val = exec_procedure(f->proc, body->cdr, env);
+            tmp = exec_procedure(f->proc, body->cdr, env);
+
+            if (expr->val != NULL)
+                value_free(expr->val);
+
+            expr->val = tmp;
             value_free(f);
             break;
         }

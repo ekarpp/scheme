@@ -315,7 +315,10 @@ value_t *builtins_if(cons_t *args, env_t *env)
         val->expr->val = NULL;
     }
     else
-        ret = value_copy(val);
+    {
+        ret = value_get(val, env);
+        ret = value_copy(ret);
+    }
 
     return ret;
 }
