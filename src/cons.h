@@ -54,6 +54,8 @@ struct value_t {
     };
 };
 
+char *type_to_string(value_type t);
+
 cons_t *cons_init(void);
 void cons_output(cons_t *cons, env_t *env);
 void cons_free(cons_t *cons);

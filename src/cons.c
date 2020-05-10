@@ -6,6 +6,31 @@
 #include "cons.h"
 #include "exec.h"
 
+
+char *type_to_string(value_type t)
+{
+    switch (t)
+    {
+    case V_BOOL:
+        return "boolean";
+    case V_LONG:
+        return "long";
+    case V_IDENTIFIER:
+        return "identifier";
+    case V_STRING:
+        return "string";
+    case V_LIST:
+        return "list";
+    case V_PROCEDURE:
+        return "procedure";
+    case V_BUILTIN:
+        return "builtin function";
+    case V_EXPRESSION:
+        return "expression";
+    }
+    return "0";
+}
+
 /* cons */
 
 cons_t *cons_init(void)

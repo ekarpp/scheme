@@ -1,10 +1,51 @@
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 
 #include "exec.h"
 #include "env.h"
 #include "hashmap.h"
 #include "builtins.h"
+
+
+#define ERR_N "\nWrong number of arguments for %s. Expected %s %d, got %d.\n"
+#define ERR_T "\nUnexpected value for %s. Expected %s, got %s.\n"
+
+#define _ERR_(...)                                       \
+    {                                                    \
+        printf(__VA_ARGS__);                             \
+        return NULL;                                     \
+    }
+
+#define _TYPE_LONG(f)                                    \
+    if (arg->type != V_LONG)                             \
+    {                                                    \
+        value_free(ret);                                 \
+        _ERR_(ERR_T, (f), "long",                        \
+              type_to_string(arg->type));                \
+    }                                                    \
+
+
+#define _ATLEAST_(n, f)                                  \
+    {                                                    \
+        cons_t *TEMP = args;                             \
+        int LEN = 0;                                     \
+        while (TEMP && LEN < (n))                        \
+        {LEN++; TEMP = TEMP->cdr;}                       \
+        if (LEN < (n))                                   \
+            _ERR_(ERR_N, (f), "atleast", (n), LEN);      \
+    }
+
+
+#define _EXACTLY_(n, f)                                  \
+    {                                                    \
+        cons_t *TMP = args;                              \
+        int LEN = 0;                                     \
+        while (TMP)                                      \
+        {LEN++; TMP = TMP->cdr;}                         \
+        if (LEN != (n))                                  \
+            _ERR_(ERR_N, (f), "exactly", (n), LEN);      \
+    }
 
 
 value_t *builtins_add(cons_t *args, env_t *env)
@@ -17,8 +58,7 @@ value_t *builtins_add(cons_t *args, env_t *env)
     while (args)
     {
         value_t *arg = exec_eval(args->car, env);
-        if (arg->type != V_LONG)
-            break;// error
+        _TYPE_LONG("+");
 
         ret->lng += arg->lng;
         args = args->cdr;
@@ -37,8 +77,7 @@ value_t *builtins_multiply(cons_t *args, env_t *env)
     while (args)
     {
         value_t *arg = exec_eval(args->car, env);
-        if (arg->type != V_LONG)
-            break;// error
+        _TYPE_LONG("*");
 
         ret->lng *= arg->lng;
         args = args->cdr;
@@ -49,6 +88,7 @@ value_t *builtins_multiply(cons_t *args, env_t *env)
 
 value_t *builtins_subtract(cons_t *args, env_t *env)
 {
+    _ATLEAST_(1, "-");
     value_t *ret = value_init();
 
     ret->type = V_LONG;
@@ -56,8 +96,8 @@ value_t *builtins_subtract(cons_t *args, env_t *env)
     if (args == NULL)
         return NULL;// error
     value_t *arg = exec_eval(args->car, env);
-    if (arg->type != V_LONG)
-        return NULL; // error
+
+    _TYPE_LONG("-");
 
     ret->lng = arg->lng;
     if (args->cdr == NULL)
@@ -67,8 +107,8 @@ value_t *builtins_subtract(cons_t *args, env_t *env)
     while (args)
     {
         arg = exec_eval(args->car, env);
-        if (arg->type != V_LONG)
-            break;// error
+        _TYPE_LONG("-");
+
         ret->lng -= arg->lng;
         args = args->cdr;
     }
@@ -111,9 +151,7 @@ value_t *builtins_abs(cons_t *args, env_t *env)
         return NULL;// error
 
     value_t *arg = exec_eval(args->car, env);
-
-    if (arg->type != V_LONG)
-        return NULL;// error
+    _TYPE_LONG("abs");
 
     ret->lng = arg->lng < 0 ? -arg->lng : arg->lng;
     return ret;
@@ -150,38 +188,59 @@ value_t *builtins_cmp(cons_t *args, char op, env_t *env)
     ret->b = 1;
 
     if (args == NULL || args->cdr == NULL)
-        return NULL;//invalid amount of arg error
-    value_t *prev = exec_eval(args->car, env);
+        return ret;
 
-    if (prev->type != V_LONG)
-        return NULL; //invalid type error
+    char *name; // for error message
+    switch (op)
+    {
+    case '<':
+        name = "<";
+        break;
+    case '>':
+        name = ">";
+        break;
+    case '=':
+        name = "=";
+        break;
+    case 'd':
+        name = ">=";
+        break;
+    case 'i':
+        name = "<=";
+        break;
+    }
+
+    value_t *prev = exec_eval(args->car, env);
+    value_t *arg = prev;
+
+    _TYPE_LONG(name);
 
     args = args->cdr;
     while (args && ret->b)
     {
-        value_t *curr = exec_eval(args->car, env);
-        if (curr->type != V_LONG)
-            break;// error
+        arg = exec_eval(args->car, env);
+        _TYPE_LONG(name);
+
         switch (op)
         {
         case '<':
-            ret->b = prev->lng < curr->lng;
+            ret->b = prev->lng < arg->lng;
             break;
         case '>':
-            ret->b = prev->lng > curr->lng;
+            ret->b = prev->lng > arg->lng;
             break;
         case '=':
-            ret->b = prev->lng == curr->lng;
+            ret->b = prev->lng == arg->lng;
             break;
         case 'd':
-            ret->b = prev->lng >= curr->lng;
+            ret->b = prev->lng >= arg->lng;
             break;
         case 'i':
-            ret->b = prev->lng <= curr->lng;
+            ret->b = prev->lng <= arg->lng;
             break;
         }
 
-        prev = curr;
+        prev = arg;
         args = args->cdr;
     }
 
@@ -216,9 +275,6 @@ value_t *builtins_non_decreasing(cons_t *args, env_t *env)
 
 value_t *builtins_lambda(cons_t *args, env_t *env)
 {
-
-
-
     if (args == NULL || args->car == NULL)
         return NULL;
 
@@ -243,10 +299,12 @@ value_t *builtins_lambda(cons_t *args, env_t *env)
 
 value_t *builtins_define(cons_t *args, env_t *env)
 {
+    _EXACTLY_(2, "define");
+
     value_t *ret = NULL;
     value_t *key = args->car;
     if (key->type != V_IDENTIFIER)
-        return NULL; // error
+        _ERR_(ERR_T, "define", "identifier", type_to_string(key->type));
 
     //exec_eval(args->cdr, env); // this should replace next lines ??
     value_t *val = exec_eval(args->cdr->car, env);
@@ -288,7 +346,8 @@ value_t *builtins_begin(cons_t *args, env_t *env)
     {
         value_t *arg = args->car;
         if (arg->type != V_EXPRESSION)
-            return NULL; // error
+            _ERR_(ERR_T, "begin", "expression", type_to_string(arg->type));
+
         ret = exec_eval(arg, env);
         prev = arg;
         args = args->cdr;
@@ -302,7 +361,7 @@ value_t *builtins_if(cons_t *args, env_t *env)
     value_t *ret;
     value_t *bool = exec_eval(args->car, env);
     if (bool->type != V_BOOL)
-        return NULL;
+        _ERR_(ERR_T, "if", "boolean", type_to_string(bool->type));
 
     cons_t *tru = args->cdr;
     cons_t *fals = tru->cdr;
