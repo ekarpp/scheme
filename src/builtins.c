@@ -18,6 +18,11 @@
     }
 
 #define _TYPE_LONG(f)                                    \
+    if (arg == NULL)                                     \
+    {                                                    \
+        value_free(ret);                                 \
+        return NULL;                                     \
+    }                                                    \
     if (arg->type != V_LONG)                             \
     {                                                    \
         value_free(ret);                                 \
@@ -93,8 +98,6 @@ value_t *builtins_subtract(cons_t *args, env_t *env)
 
     ret->type = V_LONG;
 
-    if (args == NULL)
-        return NULL;// error
     value_t *arg = exec_eval(args->car, env);
 
     _TYPE_LONG("-");
@@ -144,6 +147,7 @@ value_t *builtins_divide(cons_t *args, env_t *env)
 
 value_t *builtins_abs(cons_t *args, env_t *env)
 {
+    _EXACTLY_(1, "abs");
     value_t *ret = value_init();
     ret->type = V_LONG;
 
@@ -278,7 +282,7 @@ value_t *builtins_lambda(cons_t *args, env_t *env)
     if (args == NULL || args->car == NULL)
         return NULL;
 
-    if  (args->cdr == NULL || args->cdr->car == NULL)
+    if (args->cdr == NULL || args->cdr->car == NULL)
         return NULL; // error
     value_t *formals = args->car;
     value_t *body = args->cdr->car;
@@ -308,6 +312,8 @@ value_t *builtins_define(cons_t *args, env_t *env)
 
     //exec_eval(args->cdr, env); // this should replace next lines ??
     value_t *val = exec_eval(args->cdr->car, env);
+    if (val == NULL)
+        return NULL;
 
     if (args->cdr->car->type != V_EXPRESSION)
         // hashmap will free this
@@ -360,6 +366,8 @@ value_t *builtins_if(cons_t *args, env_t *env)
 {
     value_t *ret;
     value_t *bool = exec_eval(args->car, env);
+    if (bool == NULL)
+        return NULL;
     if (bool->type != V_BOOL)
         _ERR_(ERR_T, "if", "boolean", type_to_string(bool->type));
 

@@ -133,11 +133,15 @@ value_t *token_to_value(token_t *t)
 
 value_t *value_get(value_t *val, env_t *env)
 {
+    char *name;
     switch (val->type)
     {
     case V_IDENTIFIER:
-        val = env_get(env, val->str);
-        return (val == NULL) ? val : value_get(val, env);
+        name = val->str;
+        while (val && val->type == V_IDENTIFIER)
+            val = env_get(env, val->str);
+        if (val == NULL)
+            printf("\nUnbound identifier %s.\n", name);
     }
     return val;
 }
@@ -203,6 +207,8 @@ void cons_output(cons_t *cons, env_t *env)
 
 void value_output(value_t *val, env_t *env)
 {
+    if (val == NULL)
+        return;
     switch (val->type)
     {
     case V_IDENTIFIER:
