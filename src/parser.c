@@ -38,6 +38,8 @@ int parser_parse(parser_t *prsr, char *text)
         {
         case '(':
             expr = parser_expression(prsr);
+            if (expr == NULL)
+                {val = NULL; break;}
             exec_expr(expr, prsr->env);
             val = expr->val;
             expr->val = NULL;
@@ -47,6 +49,7 @@ int parser_parse(parser_t *prsr, char *text)
             val = token_to_value(lxr->t);
             break;
         default:
+            printf("Unexpected symbol while parsing: %s.\n", lxr->t->lexeme);
             return 0;
         }
         lexer_get_next_token(lxr);
@@ -81,8 +84,6 @@ expression_t *parser_expression(parser_t *prsr)
 
         switch (lxr->t->type)
         {
-            case T_END: // unexpected EOF
-                return NULL;
             case T_IDENTIFIER: case T_STRING: case T_LONG:
                 last->car = token_to_value(lxr->t);
                 break;
@@ -90,6 +91,11 @@ expression_t *parser_expression(parser_t *prsr)
                 last->car = value_init();
                 last->car->type = V_EXPRESSION;
                 last->car->expr = parser_expression(prsr);
+                break;
+            default:
+                expression_free(expr);
+                printf("Unexpected symbol while parsing: %s.\n", lxr->t->lexeme);
+                return NULL;
         }
         lexer_get_next_token(lxr);
     }
