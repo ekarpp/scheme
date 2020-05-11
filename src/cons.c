@@ -239,9 +239,15 @@ void value_output(value_t *val, env_t *env)
     case V_LIST:
         cons_output(val->cons, env);
         break;
-    case V_PROCEDURE: case V_BUILTIN: case V_EXPRESSION:
+    case V_PROCEDURE:
+        printf("#<procedure>");
         break;
-
+    case V_BUILTIN:
+        printf("#<builtin function>");
+        break;
+    case V_EXPRESSION:
+        printf("#<expression>");
+        break;
     }
 }
 
@@ -290,10 +296,21 @@ procedure_t *procedure_make(value_t *formals, value_t *body)
     procedure_t *proc = procedure_init();
     proc->formals = cons_copy(formals->expr->body);
 
-    value_t *expr = value_copy(body);
-    proc->expr = expr->expr;
-    expr->expr = NULL;
-    value_free(expr);
+    value_t *tmp;
+
+    switch (body->type)
+    {
+    case V_EXPRESSION:
+        tmp = value_copy(body);
+        proc->expr = tmp->expr;
+        tmp->expr = NULL;
+        value_free(tmp);
+        break;
+    default:
+        proc->expr = expression_init();
+        proc->expr->val = value_copy(body);
+        break;
+    }
 
     return proc;
 }

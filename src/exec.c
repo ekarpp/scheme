@@ -7,17 +7,19 @@
 
 int exec_expr(expression_t *expr, env_t *env)
 {
+    cons_t *body = expr->body;
+
+    if (body == NULL)
+    {
+        if (expr->val == NULL)
+            expr->val = empty_list();
+        return 1;
+    }
+
     if (expr->val != NULL)
     {
         value_free(expr->val);
         expr->val = NULL;
-    }
-
-    cons_t *body = expr->body;
-    if (body == NULL)
-    {
-        expr->val = empty_list();
-        return 1;
     }
 
     char *op = NULL;
@@ -36,7 +38,6 @@ int exec_expr(expression_t *expr, env_t *env)
         exec_expr(body->car->expr, env);
         f = body->car->expr->val;
         body->car->expr->val = NULL;
-        // env_get here ??
         break;
     }
 
@@ -80,7 +81,9 @@ value_t *exec_procedure(procedure_t *proc, cons_t *args, env_t *env)
             exec_expr(tmp->expr, env);
             // value_get
             tmp = tmp->expr->val;
-            arg->car->expr->val = NULL;
+            tmp = value_get(tmp, env);
+            if (tmp == arg->car->expr->val)
+                arg->car->expr->val = NULL;
         }
         else
         {
@@ -88,8 +91,6 @@ value_t *exec_procedure(procedure_t *proc, cons_t *args, env_t *env)
             tmp = value_copy(tmp);
         }
 
-        //value_t *v = value_get(formal, env);
-        //if (v == NULL || v == tmp)
         hashmap_put(env->hm, formal->str, tmp);
 
         arg = arg->cdr;
@@ -97,7 +98,13 @@ value_t *exec_procedure(procedure_t *proc, cons_t *args, env_t *env)
     }
     exec_expr(proc->expr, env);
     value_t *ret = proc->expr->val;
-    proc->expr->val = NULL;
+    ret = value_get(ret, env);
+    if (ret == proc->expr->val)
+        proc->expr->val = NULL;
+    else
+    {
+        ret = value_copy(ret);
+    }
     env = env_pop(env);
 
     return ret;

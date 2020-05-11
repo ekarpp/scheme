@@ -287,7 +287,6 @@ value_t *builtins_lambda(cons_t *args, env_t *env)
     if (formals->type != V_EXPRESSION)
         _ERR_(ERR_T, "lambda", "expression", type_to_string(formals->type));
 
-
     value_t *ret = value_init();
     ret->type = V_PROCEDURE;
 
