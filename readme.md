@@ -1,1 +1,1 @@
-scheme interpreter implemented in C
+An interpreter for a scheme-like language written in C. The interpreter follows the scheme specification but it does not fulfill all of the requirements (only supports 64 bit integers, no tail call optimization, some base library functions not implemented or implementation does not follow the specification).
