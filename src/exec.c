@@ -29,7 +29,7 @@ int exec_expr(expression_t *expr, env_t *env)
     {
     case V_STRING: case V_IDENTIFIER:
         op = body->car->str;
-        f = env_get(env, op);
+        f = value_get(body->car, env);
         break;
     case V_PROCEDURE:
         f = body->car;
@@ -42,6 +42,7 @@ int exec_expr(expression_t *expr, env_t *env)
     }
 
     value_t *tmp;
+
     if (f)
     {
         switch (f->type)
@@ -74,7 +75,8 @@ value_t *exec_procedure(procedure_t *proc, cons_t *args, env_t *env)
     {
         value_t *formal = formals->car;
         if (formal->type != V_IDENTIFIER || arg->car == NULL)
-            return NULL; // error
+            return NULL;
+
         value_t *tmp = arg->car;
         if (tmp->type == V_EXPRESSION)
         {
