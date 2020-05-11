@@ -8,8 +8,8 @@
 #include "builtins.h"
 
 
-#define ERR_N "\nWrong number of arguments for %s. Expected %s %d, got %d.\n"
-#define ERR_T "\nUnexpected value for %s. Expected %s, got %s.\n"
+#define ERR_N "Wrong number of arguments for %s. Expected %s %d, got %d.\n"
+#define ERR_T "Unexpected value for %s. Expected %s, got %s.\n"
 
 #define _ERR_(...)                                       \
     {                                                    \
