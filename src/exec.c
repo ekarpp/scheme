@@ -14,7 +14,7 @@ int exec_expr(expression_t *expr, env_t *env)
     }
 
     cons_t *body = expr->body;
-    if (body->car == NULL && body->cdr == NULL)
+    if (body == NULL)
     {
         expr->val = empty_list();
         return 1;
