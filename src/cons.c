@@ -57,8 +57,15 @@ void cons_free(cons_t *cons)
 cons_t *cons_copy(cons_t *cons)
 {
     cons_t *ret = cons_init();
-    ret->car = value_copy(cons->car);
-    ret->cdr = cons_copy(cons->cdr);
+    cons_t *ptr = ret;
+    while (cons)
+    {
+        if (ptr->car != NULL)
+        {ptr->cdr = cons_init(); ptr = ptr->cdr;}
+
+        ptr->car = value_copy(cons->car);
+        cons = cons->cdr;
+    }
     return ret;
 }
 
@@ -133,6 +140,8 @@ value_t *token_to_value(token_t *t)
 
 value_t *value_get(value_t *val, env_t *env)
 {
+    if (val == NULL)
+        return NULL;
     char *name;
     switch (val->type)
     {
@@ -148,6 +157,9 @@ value_t *value_get(value_t *val, env_t *env)
 
 value_t *value_copy(value_t *val)
 {
+    if (val == NULL)
+        return NULL;
+
     value_t *ret = value_init();
     ret->type = val->type;
 
@@ -276,11 +288,12 @@ procedure_t *procedure_init(void)
 procedure_t *procedure_make(value_t *formals, value_t *body)
 {
     procedure_t *proc = procedure_init();
-    proc->formals = formals->expr->body;
-    formals->expr->body = NULL;
+    proc->formals = cons_copy(formals->expr->body);
 
-    proc->expr = body->expr;
-    body->expr = NULL;
+    value_t *expr = value_copy(body);
+    proc->expr = expr->expr;
+    expr->expr = NULL;
+    value_free(expr);
 
     return proc;
 }
