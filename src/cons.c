@@ -141,7 +141,7 @@ value_t *value_get(value_t *val, env_t *env)
         while (val && val->type == V_IDENTIFIER)
             val = env_get(env, val->str);
         if (val == NULL)
-            printf("\nUnbound identifier %s.\n", name);
+            printf("Unbound identifier %s.\n", name);
     }
     return val;
 }
