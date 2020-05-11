@@ -279,16 +279,17 @@ value_t *builtins_non_decreasing(cons_t *args, env_t *env)
 
 value_t *builtins_lambda(cons_t *args, env_t *env)
 {
-    if (args == NULL || args->car == NULL)
-        return NULL;
+    _ATLEAST_(2, "lambda");
 
-    if (args->cdr == NULL || args->cdr->car == NULL)
-        return NULL; // error
     value_t *formals = args->car;
     value_t *body = args->cdr->car;
 
-    if (formals->type != V_EXPRESSION || body->type != V_EXPRESSION)
-        return NULL; // error for now
+    if (formals->type != V_EXPRESSION)
+        _ERR_(ERR_T, "lambda", "expression", type_to_string(formals->type));
+
+    if (body->type != V_EXPRESSION)
+        _ERR_(ERR_T, "lambda", "expression", type_to_string(body->type));
+
 
     value_t *ret = value_init();
     ret->type = V_PROCEDURE;
