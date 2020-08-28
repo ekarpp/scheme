@@ -1,17 +1,17 @@
-#include "interpretor.h"
+#include "interpreter.h"
 #include <stdlib.h>
 #include <stdio.h>
 
-interpretor_t *interpretor_init(void)
+interpreter_t *interpreter_init(void)
 {
-    interpretor_t *interp = malloc(sizeof(interpretor_t));
+    interpreter_t *interp = malloc(sizeof(interpreter_t));
     interp->prsr = parser_init();
     if (interp->prsr == NULL)
         return NULL;
     return interp;
 }
 
-void interpret_file(interpretor_t *interp, char *fname)
+void interpret_file(interpreter_t *interp, char *fname)
 {
     FILE *f = fopen(fname, "r");
     if (f == NULL)
@@ -30,7 +30,7 @@ void interpret_file(interpretor_t *interp, char *fname)
     free(txt);
 }
 
-int interpret_text(interpretor_t *interp, char *text)
+int interpret_text(interpreter_t *interp, char *text)
 {
     if (text[1] == '\0')
         return 0;
@@ -41,7 +41,7 @@ int interpret_text(interpretor_t *interp, char *text)
     }
 }
 
-void interpretor_free(interpretor_t *interp)
+void interpreter_free(interpreter_t *interp)
 {
     parser_free(interp->prsr);
     free(interp);

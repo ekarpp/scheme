@@ -1,10 +1,10 @@
 #include <stdio.h>
-#include "src/interpretor.h"
+#include "src/interpreter.h"
 
 int main(int argc, char **argv)
 {
 
-    interpretor_t *interp = interpretor_init();
+    interpreter_t *interp = interpreter_init();
     if (interp == NULL)
         return -1;
 
@@ -22,7 +22,7 @@ int main(int argc, char **argv)
         } while (ret);
     }
 
-    interpretor_free(interp);
+    interpreter_free(interp);
 
     return 0;
 }
