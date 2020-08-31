@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include "src/interpreter.h"
 
+#define LEN 255
+
 int main(int argc, char **argv)
 {
 
@@ -14,10 +16,10 @@ int main(int argc, char **argv)
     else
     {
         int ret;
-        char text[255];
+        char text[LEN];
         do {
             printf(">> ");
-            fgets(text, 255, stdin);
+            fgets(text, LEN, stdin);
             ret = interpret_text(interp, text);
         } while (ret);
     }
