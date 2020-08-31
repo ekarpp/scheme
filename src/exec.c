@@ -73,9 +73,19 @@ value_t *exec_procedure(procedure_t *proc, cons_t *args, env_t *env)
     /* parse arguments */
     while (formals)
     {
+        // mismatch in number of arguments
+        if (arg == NULL)
+        {
+            env_pop(env);
+            return NULL;
+        }
+
         value_t *formal = formals->car;
         if (formal->type != V_IDENTIFIER || arg->car == NULL)
+        {
+            env_pop(env);
             return NULL;
+        }
 
         value_t *tmp = arg->car;
         if (tmp->type == V_EXPRESSION)
