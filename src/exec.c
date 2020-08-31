@@ -22,13 +22,12 @@ int exec_expr(expression_t *expr, env_t *env)
         expr->val = NULL;
     }
 
-    char *op = NULL;
     value_t *f = NULL;
 
+    /* get function to execute */
     switch (body->car->type)
     {
     case V_STRING: case V_IDENTIFIER:
-        op = body->car->str;
         f = value_get(body->car, env);
         break;
     case V_PROCEDURE:
@@ -71,6 +70,7 @@ value_t *exec_procedure(procedure_t *proc, cons_t *args, env_t *env)
     cons_t *formals = proc->formals;
     cons_t *arg = args;
 
+    /* parse arguments */
     while (formals)
     {
         value_t *formal = formals->car;
@@ -98,15 +98,22 @@ value_t *exec_procedure(procedure_t *proc, cons_t *args, env_t *env)
         arg = arg->cdr;
         formals = formals->cdr;
     }
+
     exec_expr(proc->expr, env);
     value_t *ret = proc->expr->val;
     ret = value_get(ret, env);
+    /* if return value was not a bound identifier */
     if (ret == proc->expr->val)
+        /*
+         remove it from the expression,
+         so it won't be mistakenly free'd
+         on the next call of the procedure
+        */
         proc->expr->val = NULL;
     else
-    {
+        /* else make a copy of it */
         ret = value_copy(ret);
-    }
+
     env = env_pop(env);
 
     return ret;

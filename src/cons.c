@@ -240,13 +240,13 @@ void value_output(value_t *val, env_t *env)
         cons_output(val->cons, env);
         break;
     case V_PROCEDURE:
-        printf("#<procedure>");
+        printf("<procedure>");
         break;
     case V_BUILTIN:
-        printf("#<builtin function>");
+        printf("<builtin function>");
         break;
     case V_EXPRESSION:
-        printf("#<expression>");
+        printf("<expression>");
         break;
     }
 }
@@ -288,9 +288,6 @@ procedure_t *procedure_init(void)
     return proc;
 }
 
-// args has two lists
-// first is formals ( can also be other than list, fix later)
-// second is body
 procedure_t *procedure_make(value_t *formals, value_t *body)
 {
     procedure_t *proc = procedure_init();
