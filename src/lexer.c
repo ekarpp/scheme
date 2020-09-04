@@ -197,13 +197,18 @@ int lexer_identifier(lexer_t *lxr)
         return 0;
     switch (*lxr->curr)
     {
+        /* special initials */
         case '!': case '$': case '%': case '&': case '*':
         case '/': case ':': case '<': case '=': case '>':
         case '?': case '^': case '_': case '~':
+        /* digits */
         case '0': case '1': case '2': case '3': case '4':
         case '5': case '6': case '7': case '8': case '9':
+        /* special subsequent */
+        case '.': case '@': case '+': case '-':
             return lexer_identifier(lxr);
         default:
+            /* letter */
             if ((*lxr->curr >= 'A' && *lxr->curr <= 'Z')
                || (*lxr->curr >= 'a' && *lxr->curr <= 'z'))
                 return lexer_identifier(lxr);
